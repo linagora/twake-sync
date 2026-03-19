@@ -2,6 +2,8 @@
  * Copyright © All Contributors. See LICENSE and AUTHORS in the root directory for details.
  */
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -11,12 +13,18 @@ plugins {
     id("davx5.common-buildconfig")
 }
 
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists())
+        keystorePropertiesFile.inputStream().use { stream -> load(stream) }
+}
+
 android {
     defaultConfig {
-        applicationId = "at.bitfire.davdroid"
+        applicationId = "com.twake.android.sync"
 
         // versionCode and versionName are defined in the build-logic submodule (AppVersion)
-        base.archivesName = "davx5-$versionCode-$versionName"
+        base.archivesName = "twake-sync-$versionCode-$versionName"
 
         /* Android prevents having two apps installed with the same provider authority name. In that case,
         Google Play just shows a generic "Can't install DAVx5" message. So we derive the authority names
@@ -78,10 +86,17 @@ android {
 
     signingConfigs {
         create("bitfire") {
-            storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "/dev/null")
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile") ?: "/dev/null")
+                storePassword = keystoreProperties.getProperty("storePassword")
+            } else {
+                storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "/dev/null")
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
         }
     }
 
