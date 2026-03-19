@@ -40,10 +40,7 @@ class OpenSourcePage @Inject constructor(
 ): IntroPage() {
 
     override fun getShowPolicy(): ShowPolicy {
-        return if (System.currentTimeMillis() > (settingsManager.getLongOrNull(Model.SETTING_NEXT_DONATION_POPUP) ?: 0))
-            ShowPolicy.SHOW_ALWAYS
-        else
-            ShowPolicy.DONT_SHOW
+        return ShowPolicy.DONT_SHOW
     }
 
     @Composable
