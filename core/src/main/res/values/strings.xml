@@ -5,12 +5,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- common strings -->
-    <string name="app_name" translatable="false">DAVx⁵</string>
+    <string name="app_name" translatable="false">Twake Sync</string>
 
     <string name="account_invalid">Account does not exist (anymore)</string>
     <string name="account_type" translatable="false">bitfire.at.davdroid</string>
     <string name="account_type_address_book" translatable="false">at.bitfire.davdroid.address_book</string>
-    <string name="account_title_address_book">DAVx⁵ Address book</string>
+    <string name="account_title_address_book">Twake Sync Address book</string>
     <string name="account_prefs_use_app">Don\'t change the account here! Directly use the app to manage accounts instead.</string>
     <string name="dialog_delete">Delete</string>
     <string name="dialog_remove">Remove</string>
@@ -125,6 +125,7 @@
     <string name="about_version">Version %1$s (%2$d)</string>
     <string name="about_copyright">© Ricki Hirner, Bernhard Stockmann (bitfire web engineering GmbH) and contributors</string>
     <string name="about_license_info_no_warranty">This program comes with ABSOLUTELY NO WARRANTY. It is free software, and you are welcome to redistribute it under certain conditions.</string>
+    <string name="about_fork_introduction">Twake Sync enables you to sync the contacts and calendars in Twake Workplace. This application is a fork of the OpenSource DAVx⁵ solution.</string>
 
     <!-- global settings -->
     <string name="logging_couldnt_create_file">Couldn\'t create log file</string>
@@ -149,7 +150,7 @@
     <string name="navigation_drawer_support_project">Support the project</string>
     <string name="navigation_drawer_contribute">How to contribute</string>
     <string name="navigation_drawer_privacy_policy">Privacy policy</string>
-    <string name="account_list_welcome">Welcome to DAVx⁵!</string>
+    <string name="account_list_welcome">Welcome to Twake Sync!</string>
     <string name="account_list_empty">Connect to your server and keep your calendars and contacts synchronized.</string>
     <string name="accounts_sync_all">Sync all accounts</string>
 
@@ -273,7 +274,7 @@
     <string name="account_refresh_collections">Refresh list</string>
     <string name="account_webcal_external_app">Webcal subscriptions can be synchronized with external apps.</string>
     <string name="account_no_webcal_handler_found">No Webcal-capable app found</string>
-    <string name="account_install_icsx5">Install ICSx⁵</string>
+    <string name="account_install_icsx5">Install Twake Sync ICS</string>
 
     <!-- AddAccountActivity -->
     <string name="login_title">Add account</string>
@@ -459,7 +460,7 @@
     <string name="collection_url">Address (URL)</string>
 
     <!-- debugging and DebugInfoActivity -->
-    <string name="authority_debug_provider" translatable="false">at.bitfire.davdroid.debug</string>
+    <string name="authority_debug_provider" translatable="false">com.twake.android.sync.debug</string>
     <string name="debug_info_title">Debug info</string>
     <string name="debug_info_archive_caption">ZIP archive</string>
     <string name="debug_info_archive_subtitle">Contains debug info and logs</string>
@@ -497,7 +498,7 @@
     <string name="exception_show_details">Show details</string>
 
     <!-- WebDAV accounts -->
-    <string name="webdav_authority" translatable="false">at.bitfire.davdroid.webdav</string>
+    <string name="webdav_authority" translatable="false">com.twake.android.sync.webdav</string>
     <string name="webdav_mounts_title">WebDAV mounts</string>
     <string name="webdav_mounts_quota_used_available">Quota used: %1$s / available: %2$s</string>
     <string name="webdav_mounts_share_content">Share content</string>
@@ -524,7 +525,7 @@
     <string name="webdav_provider_root_title">WebDAV mount</string>
 
     <!-- sync -->
-    <string name="sync_error_permissions">DAVx⁵ permissions</string>
+    <string name="sync_error_permissions">Twake Sync permissions</string>
     <string name="sync_error_permissions_text">Additional permissions required</string>
     <string name="sync_error_tasks_too_old">%s too old</string>
     <string name="sync_error_tasks_required_version">Minimum required version: %1$s</string>

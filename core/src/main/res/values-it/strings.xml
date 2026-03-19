@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--common strings-->
   <string name="account_invalid">Account inesistente (o cancellato)</string>
-    <string name="account_title_address_book">Rubrica DAVx⁵</string>
+    <string name="account_title_address_book">Rubrica Twake Sync</string>
     <string name="dialog_delete">Cancella</string>
     <string name="dialog_remove">Elimina</string>
     <string name="dialog_deny">Annulla</string>
@@ -192,7 +192,7 @@
     <string name="account_refresh_collections">Aggiorna lista</string>
     <string name="account_webcal_external_app">Sottoscrizioni al Webcal possono essere sincronizzate con applicazioni esterne.</string>
     <string name="account_no_webcal_handler_found">Non ho trovato nessuna applicazione abilitata per Webcal</string>
-    <string name="account_install_icsx5">Installa ICSx⁵</string>
+    <string name="account_install_icsx5">Installa Twake Sync ICS</string>
     <!--AddAccountActivity-->
   <string name="login_title">Aggiungi account</string>
     <string name="login_generic_login">Login generico</string>
@@ -387,7 +387,7 @@ Lasciare vuoto per non creare un promemoria predefinito.</string>
     <string name="webdav_notification_upload">Caricare file WebDAV</string>
     <string name="webdav_provider_root_title">Installazione WebDAV</string>
     <!--sync-->
-  <string name="sync_error_permissions">Autorizzazioni DAVx⁵</string>
+  <string name="sync_error_permissions">Autorizzazioni Twake Sync</string>
     <string name="sync_error_permissions_text">Autorizzazioni addizionali richieste</string>
     <string name="sync_error_tasks_too_old">%s troppo vecchio</string>
     <string name="sync_error_tasks_required_version">Versione minima richiesta %1$s</string>
@@ -420,7 +420,7 @@ Lasciare vuoto per non creare un promemoria predefinito.</string>
     <string name="wifi_permissions_background_location_disclaimer">%s utilizza i dati di localizzazione (solo SSID WiFi) unicamente per limitare la sincronizzazione a uno specifico SSID WiFi. Ciò avverrà anche quando la sincronizzazione viene eseguita in background.</string>
     <string name="wifi_permissions_background_location_disclaimer2">Tutti i dati di localizzazione (il solo SSID WiFi) sono usati solo localmente e non vengono spediti da nessuna parte.</string>
     <string name="navigation_drawer_managed">Per le organizzazioni</string>
-    <string name="account_list_welcome">Benvenuti in DAVx⁵!</string>
+    <string name="account_list_welcome">Benvenuti in Twake Sync!</string>
     <string name="account_list_empty">Connettiti al tuo server per tenere i tuoi calendari e contatti della rubrica sempre sincronizzati.</string>
     <string name="sync_warning_no_internet">La sincronizzazione automatica non è attiva (nessuna connessione Internet verificata)</string>
     <string name="sync_warning_manage_datasaver">Gestione del risparmio dati</string>

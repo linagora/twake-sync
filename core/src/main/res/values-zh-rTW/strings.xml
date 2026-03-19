@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">帳號（已）不存在</string>
-  <string name="account_title_address_book">DAVx⁵ 通訊錄</string>
+  <string name="account_title_address_book">Twake Sync 通訊錄</string>
   <string name="account_prefs_use_app">別在這裡更改帳戶！請直接使用應用程式管理帳戶。</string>
   <string name="dialog_delete">刪除</string>
   <string name="dialog_remove">移除</string>
@@ -124,7 +124,7 @@
   <string name="navigation_drawer_support_project">支持此項目</string>
   <string name="navigation_drawer_contribute">如何貢獻</string>
   <string name="navigation_drawer_privacy_policy">隱私權政策</string>
-  <string name="account_list_welcome">歡迎使用 DAVx⁵！</string>
+  <string name="account_list_welcome">歡迎使用 Twake Sync！</string>
   <string name="account_list_empty">連線到您的伺服器，並保持行事曆與聯絡人同步。</string>
   <string name="accounts_sync_all">同步所有帳戶</string>
   <!--Sync warnings-->
@@ -230,7 +230,7 @@
   <string name="account_refresh_collections">重新整理清單</string>
   <string name="account_webcal_external_app">Webcal 訂閱可與外部應用程式同步。</string>
   <string name="account_no_webcal_handler_found">未找到支援Webcal的APP</string>
-  <string name="account_install_icsx5">安裝ICSx⁵</string>
+  <string name="account_install_icsx5">安裝Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">新增帳號</string>
   <string name="login_privacy_hint"><![CDATA[所有資料只會在您的伺服器與您的裝置之間傳輸。%1$s 不會將它們傳送至其他任何地方。請參閱 <a href="%2$s">隱私權政策</a>。]]></string>
@@ -451,7 +451,7 @@
   <string name="webdav_notification_upload">正在上傳檔案至 WebDAV</string>
   <string name="webdav_provider_root_title">WebDAV 掛載</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ 權限</string>
+  <string name="sync_error_permissions">Twake Sync 權限</string>
   <string name="sync_error_permissions_text">需要額外的權限</string>
   <string name="sync_error_tasks_too_old">%s過舊</string>
   <string name="sync_error_tasks_required_version">最低需求版本：%1$s</string>

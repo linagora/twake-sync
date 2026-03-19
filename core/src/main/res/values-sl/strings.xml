@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Račun ne obstaja (več)</string>
-  <string name="account_title_address_book">DAVx⁵ imenik</string>
+  <string name="account_title_address_book">Twake Sync imenik</string>
   <string name="dialog_remove">Odstrani</string>
   <string name="dialog_deny">Preklic</string>
   <string name="dialog_enable">Omogoči</string>
@@ -106,7 +106,7 @@
   <string name="account_journal">dnevnik</string>
   <string name="account_only_personal">Pokaži samo osebno</string>
   <string name="account_no_webcal_handler_found">Nobena Webcal sposobna aplikacija ni bila najdena</string>
-  <string name="account_install_icsx5">Namesti ICSx⁵</string>
+  <string name="account_install_icsx5">Namesti Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Dodaj račun</string>
   <string name="login_login">Prijava</string>
@@ -196,7 +196,7 @@
   <string name="webdav_add_mount_username">Uporabniško ime</string>
   <string name="webdav_add_mount_password">Geslo</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ dovoljenja</string>
+  <string name="sync_error_permissions">Twake Sync dovoljenja</string>
   <string name="sync_error_permissions_text">Dodatna dovoljenja so zahtevana</string>
   <string name="sync_error_authentication_failed">Avtentikacija ni uspela (preverite podatke prijave)</string>
   <string name="sync_error_io">Omrežna ali I/O napaka -- %s</string>

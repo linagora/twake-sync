@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">アカウントがありません</string>
-  <string name="account_title_address_book">DAVx⁵ アドレス帳</string>
+  <string name="account_title_address_book">Twake Sync アドレス帳</string>
   <string name="account_prefs_use_app">ここでアカウントを変更しないでください！ アカウントの管理は、アプリから直接行ってください。</string>
   <string name="dialog_delete">削除</string>
   <string name="dialog_remove">削除</string>
@@ -124,7 +124,7 @@
   <string name="navigation_drawer_support_project">プロジェクトを支援</string>
   <string name="navigation_drawer_contribute">貢献する方法</string>
   <string name="navigation_drawer_privacy_policy">プライバシーポリシー</string>
-  <string name="account_list_welcome">DAVx⁵ にようこそ！</string>
+  <string name="account_list_welcome">Twake Sync にようこそ！</string>
   <string name="account_list_empty">サーバーに接続して、カレンダーと連絡先を同期しましょう。</string>
   <string name="accounts_sync_all">すべてのアカウントを同期</string>
   <!--Sync warnings-->
@@ -230,7 +230,7 @@
   <string name="account_refresh_collections">リストを再読み込み</string>
   <string name="account_webcal_external_app">Webcal の購読は外部アプリで同期できます。</string>
   <string name="account_no_webcal_handler_found">Webcal に対応するアプリが見つかりませんでした</string>
-  <string name="account_install_icsx5">ICSx⁵ をインストール</string>
+  <string name="account_install_icsx5">Twake Sync ICS をインストール</string>
   <!--AddAccountActivity-->
   <string name="login_title">アカウントを追加</string>
   <string name="login_privacy_hint"><![CDATA[すべての情報はサーバーと端末間のみ転送されます。%1$s が情報をどこかに送信することはありません。<a href="%2$s">プライバシーポリシー</a> をご確認ください。]]></string>
@@ -453,7 +453,7 @@
   <string name="webdav_notification_upload">WebDAV ファイルをアップロードしています</string>
   <string name="webdav_provider_root_title">WebDAV マウント</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ の権限</string>
+  <string name="sync_error_permissions">Twake Sync の権限</string>
   <string name="sync_error_permissions_text">アクセス権限の許可が必要です</string>
   <string name="sync_error_tasks_too_old">%s が古すぎます</string>
   <string name="sync_error_tasks_required_version">最小要求バージョン: %1$s</string>

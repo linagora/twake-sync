@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Konto findes ikke (længere)</string>
-  <string name="account_title_address_book">DAVx⁵ adressebog</string>
+  <string name="account_title_address_book">Twake Sync adressebog</string>
   <string name="account_prefs_use_app">Foretag ikke ændringer i din konto her! Brug i stedet app\'en til direkte at håndtere konti.</string>
   <string name="dialog_delete">Slet</string>
   <string name="dialog_remove">Fjern</string>
@@ -202,7 +202,7 @@ Lav lagerplads. Android vil ikke synkronisere lokale ændringer med det samme, m
   <string name="account_refresh_collections">Opdater listen</string>
   <string name="account_webcal_external_app">Webcal-abonnementer kan synkroniseres med eksterne apps.</string>
   <string name="account_no_webcal_handler_found">Der er ikke fundet noget program der kan håndtere Webcal.</string>
-  <string name="account_install_icsx5">Installere ICSx⁵</string>
+  <string name="account_install_icsx5">Installere Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Tilføj konto</string>
   <string name="login_generic_login">Generisk login</string>
@@ -396,7 +396,7 @@ Lav lagerplads. Android vil ikke synkronisere lokale ændringer med det samme, m
   <string name="webdav_notification_upload">Overfør WebDAV fil</string>
   <string name="webdav_provider_root_title">Montere WebDAV</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵-rettigheder</string>
+  <string name="sync_error_permissions">Twake Sync-rettigheder</string>
   <string name="sync_error_permissions_text">Yderligere adgang påkrævet</string>
   <string name="sync_error_tasks_too_old">%s for gammel</string>
   <string name="sync_error_tasks_required_version">Påkrævet version: %1$s</string>

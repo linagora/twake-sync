@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--common strings-->
   <string name="account_invalid">Account bestaat niet (of niet meer)</string>
-    <string name="account_title_address_book">DAVx⁵ Adresboek</string>
+    <string name="account_title_address_book">Twake Sync Adresboek</string>
     <string name="account_prefs_use_app">Verander hier niet van account! Gebruik in plaats daarvan direct de app om accounts te beheren.</string>
     <string name="dialog_delete">Verwijderen</string>
     <string name="dialog_remove">Verwijderen</string>
@@ -125,7 +125,7 @@
     <string name="navigation_drawer_support_project">Ondersteun het project</string>
     <string name="navigation_drawer_contribute">Hoe bijdragen</string>
     <string name="navigation_drawer_privacy_policy">Privacybeleid</string>
-    <string name="account_list_welcome">Welkom bij DAVx⁵!</string>
+    <string name="account_list_welcome">Welkom bij Twake Sync!</string>
     <string name="account_list_empty">Maak verbinding met je server en houd je agenda\'s en contactpersonen gesynchroniseerd.</string>
     <string name="accounts_sync_all">Alle accounts synchroniseren</string>
     <!--Sync warnings-->
@@ -231,7 +231,7 @@
     <string name="account_refresh_collections">Lijst verversen</string>
     <string name="account_webcal_external_app">Webcal abonnementen kunnen worden gesynchroniseerd met externe apps.</string>
     <string name="account_no_webcal_handler_found">Geen Webcal-app gevonden</string>
-    <string name="account_install_icsx5">ICSx⁵ installeren</string>
+    <string name="account_install_icsx5">Twake Sync ICS installeren</string>
     <!--AddAccountActivity-->
   <string name="login_title">Account toevoegen</string>
     <string name="login_privacy_hint"><![CDATA[Alle gegevens worden alleen overgedragen tussen je server en je apparaat. %1$s zal ze nergens anders naartoe sturen. Zie<a href="%2$s">privacybeleid</a>.]]></string>
@@ -458,7 +458,7 @@
     <string name="webdav_notification_upload">WebDAV-bestand uploaden</string>
     <string name="webdav_provider_root_title">WebDAV-koppeling</string>
     <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ rechten</string>
+  <string name="sync_error_permissions">Twake Sync rechten</string>
     <string name="sync_error_permissions_text">Aanvullende rechten vereist</string>
     <string name="sync_error_tasks_too_old">%ste oud</string>
     <string name="sync_error_tasks_required_version">Minimaal vereiste versie: %1$s</string>

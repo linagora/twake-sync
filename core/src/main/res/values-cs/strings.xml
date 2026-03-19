@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Účet (už) neexistuje</string>
-  <string name="account_title_address_book">DAVx⁵ adresář kontaktů</string>
+  <string name="account_title_address_book">Twake Sync adresář kontaktů</string>
   <string name="dialog_delete">Odstranit</string>
   <string name="dialog_remove">Odebrat</string>
   <string name="dialog_deny">Storno</string>
@@ -198,7 +198,7 @@
   <string name="account_refresh_collections">Obnovit seznam</string>
   <string name="account_webcal_external_app">Odběry webcal mohou být synchronizovány externími aplikacemi.</string>
   <string name="account_no_webcal_handler_found">Nenalezena žádná aplikace, která by umožňovala webcal</string>
-  <string name="account_install_icsx5">Nainstalovat ICSx⁵</string>
+  <string name="account_install_icsx5">Nainstalovat Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Přidat účet</string>
   <string name="login_generic_login">Obecné přihlášení</string>
@@ -394,7 +394,7 @@
   <string name="webdav_notification_upload">Nahrává se WebDAV soubor</string>
   <string name="webdav_provider_root_title">WebDAV připojení</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ oprávnění</string>
+  <string name="sync_error_permissions">Twake Sync oprávnění</string>
   <string name="sync_error_permissions_text">Vyžadována dodatečná oprávnění</string>
   <string name="sync_error_tasks_too_old">Příliš stará verze %s</string>
   <string name="sync_error_tasks_required_version">Nejnižší požadovaná verze: %1$s</string>

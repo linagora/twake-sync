@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">La cuenta (ya) no existe</string>
-  <string name="account_title_address_book">Agenda DAVx⁵</string>
+  <string name="account_title_address_book">Agenda Twake Sync</string>
   <string name="dialog_delete">Eliminar</string>
   <string name="dialog_remove">Eliminar</string>
   <string name="dialog_deny">Cancelar</string>
@@ -200,7 +200,7 @@
   <string name="account_refresh_collections">Recargar lista</string>
   <string name="account_webcal_external_app">Las subscripciones webcal pueden ser sincronizadas con apps externas.</string>
   <string name="account_no_webcal_handler_found">No se encontró aplicación para administrar Webcal</string>
-  <string name="account_install_icsx5">Instalar ICSx⁵</string>
+  <string name="account_install_icsx5">Instalar Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Añadir cuenta</string>
   <string name="login_generic_login">Inicio de sesión genérico</string>
@@ -398,7 +398,7 @@
   <string name="webdav_notification_upload">Subiendo fichero WebDAV</string>
   <string name="webdav_provider_root_title">Montaje WebDAV</string>
   <!--sync-->
-  <string name="sync_error_permissions">Permisos de DAVx⁵</string>
+  <string name="sync_error_permissions">Permisos de Twake Sync</string>
   <string name="sync_error_permissions_text">Permisos adicionales requeridos</string>
   <string name="sync_error_tasks_too_old">%s muy antiguo</string>
   <string name="sync_error_tasks_required_version">Mínima versión requerida: %1$s</string>
