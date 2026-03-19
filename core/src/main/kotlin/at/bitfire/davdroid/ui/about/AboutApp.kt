@@ -68,6 +68,14 @@ fun AboutApp(
         )
 
         Text(
+            stringResource(R.string.about_fork_introduction),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        )
+
+        Text(
             stringResource(R.string.about_license_info_no_warranty),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
