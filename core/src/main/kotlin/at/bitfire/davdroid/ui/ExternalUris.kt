@@ -22,13 +22,13 @@ object ExternalUris {
     object Homepage {
 
         val baseUrl
-            get() = "https://www.davx5.com".toUri()
+            get() = "https://www.linagora.com".toUri()
 
         const val PATH_FAQ = "faq"
         const val PATH_FAQ_SYNC_NOT_RUN = "synchronization-is-not-run-as-expected"
         const val PATH_FAQ_LOCATION_PERMISSION = "wifi-ssid-restriction-location-permission"
         const val PATH_OPEN_SOURCE = "donate"
-        const val PATH_PRIVACY = "privacy"
+        const val PATH_PRIVACY = "en/legal/privacy/"
         const val PATH_TESTED_SERVICES = "tested-with"
 
         const val PATH_ORGANIZATIONS = "organizations"
