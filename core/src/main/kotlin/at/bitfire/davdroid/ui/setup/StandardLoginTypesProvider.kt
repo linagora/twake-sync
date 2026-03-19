@@ -40,10 +40,8 @@ class StandardLoginTypesProvider @Inject constructor(
                     LoginAction(EmailLogin, true)
                 listOf("caldavs", "carddavs", "davx5", "http", "https").any { uri?.scheme == it } ->
                     LoginAction(UrlLogin, true)
-                else -> {
-                    logger.warning("Did not understand login intent: $intent")
-                    LoginAction(defaultLoginType, false) // Don't skip login type page if intent is unclear
-                }
+                // Bypass method selection screen, go directly to email/password login
+                else -> LoginAction(EmailLogin, true)
             }
         }
 
