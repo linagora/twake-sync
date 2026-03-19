@@ -216,7 +216,14 @@ data class Collection(
                     } else { // Type.WEBCAL
                         dav[Source::class.java]?.let {
                             source = it.hrefs.firstOrNull()?.let { rawHref ->
-                                val href = rawHref
+
+                                val newRaw = if (rawHref.startsWith("/")) {
+                                    url.resolve(rawHref)?.let { fullHref -> "$fullHref?export" }
+                                } else {
+                                    rawHref
+                                }
+
+                                val href = (newRaw ?: rawHref)
                                         .replace("^webcal://".toRegex(), "http://")
                                         .replace("^webcals://".toRegex(), "https://")
                                 href.toHttpUrlOrNull()
