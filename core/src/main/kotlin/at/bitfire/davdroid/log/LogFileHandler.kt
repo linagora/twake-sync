@@ -150,7 +150,7 @@ class LogFileHandler @Inject constructor(
     }
 
     companion object {
-        val LOG_FILE_NAME = DebugDirectory.FileName("davx5-log.txt")
+        val LOG_FILE_NAME = DebugDirectory.FileName("twake-sync-log.txt")
     }
 
 }
