@@ -21,7 +21,7 @@ class ProductIds @Inject constructor(
 
     private val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
     private val versionName = packageInfo.versionName ?: PackageInfoCompat.getLongVersionCode(packageInfo).toString()
-    val httpUserAgent = "DAVx5/$versionName (${context.packageName})"
+    val httpUserAgent = "TwakeSync/$versionName (${context.packageName})"
 
 
     // product IDs for iCalendar/vCard
