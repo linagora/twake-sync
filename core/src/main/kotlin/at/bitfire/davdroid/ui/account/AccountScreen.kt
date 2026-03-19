@@ -432,7 +432,7 @@ fun AccountScreen(
                                             ) {
                                                 val installIntent = Intent(
                                                     Intent.ACTION_VIEW,
-                                                    "market://details?id=at.bitfire.icsdroid".toUri()
+                                                    "market://details?id=com.twake.android.sync.ics".toUri()
                                                 )
                                                 if (context.packageManager.resolveActivity(installIntent, 0) != null)
                                                     context.startActivity(installIntent)
