@@ -728,18 +728,6 @@ fun AppSettings_Integration(
     SettingsHeader(divider = true) {
         Text(stringResource(R.string.app_settings_integration))
     }
-    Setting(
-        name = {
-            Text(stringResource(R.string.app_settings_tasks_provider))
-        },
-        icon = {
-           tasksAppIcon?.let {
-               Image(tasksAppIcon.toBitmap().asImageBitmap(), tasksAppName)
-           }
-        },
-        summary = tasksAppName,
-        onClick = onNavTasksScreen
-    )
 
     var showingDistributorDialog by remember { mutableStateOf(false) }
     if (showingDistributorDialog) {
