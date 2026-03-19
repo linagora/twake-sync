@@ -17,10 +17,7 @@ class TasksIntroPage @Inject constructor(
 ): IntroPage() {
 
     override fun getShowPolicy(): ShowPolicy {
-        return if (tasksAppManager.currentProvider() != null || settingsManager.getBooleanOrNull(TasksModel.HINT_OPENTASKS_NOT_INSTALLED) == false)
-                ShowPolicy.DONT_SHOW
-            else
-                ShowPolicy.SHOW_ALWAYS
+        return ShowPolicy.DONT_SHOW
     }
 
     @Composable
