@@ -2,12 +2,20 @@
  * Copyright © All Contributors. See LICENSE and AUTHORS in the root directory for details.
  */
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.mikepenz.aboutLibraries.android)
+}
+
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists())
+        keystorePropertiesFile.inputStream().use { stream -> load(stream) }
 }
 
 android {
@@ -17,12 +25,12 @@ android {
         minSdk = 24        // Android 7.0
         targetSdk = 36     // Android 16
 
-        applicationId = "at.bitfire.davdroid"
+        applicationId = "com.twake.android.sync"
 
         versionCode = 405110000
         versionName = "4.5.11-alpha.1"
 
-        base.archivesName = "davx5-$versionCode-$versionName"
+        base.archivesName = "twake-sync-$versionCode-$versionName"
 
         // currently no instrumentation tests for app-ose, so no testInstrumentationRunner
     }
@@ -73,10 +81,17 @@ android {
 
     signingConfigs {
         create("bitfire") {
-            storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "/dev/null")
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile") ?: "/dev/null")
+                storePassword = keystoreProperties.getProperty("storePassword")
+            } else {
+                storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "/dev/null")
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
         }
     }
 
