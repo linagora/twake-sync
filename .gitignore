@@ -4,6 +4,7 @@
 # Built application files
 *.apk
 *.ap_
+*.aab
 
 # Files for the Dalvik VM
 *.dex
@@ -87,3 +88,5 @@ gradle-app.setting
 
 # Javadoc
 javadoc/
+
+key.properties
