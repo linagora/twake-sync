@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
-  <string name="account_title_address_book">DAVx⁵-adressebok</string>
+  <string name="account_title_address_book">Twake Sync-adressebok</string>
   <string name="dialog_enable">Skru på</string>
   <string name="help">Hjelp</string>
   <string name="notification_channel_debugging">Feilsøking</string>
@@ -74,7 +74,7 @@
   <string name="account_read_only">kun lesbar</string>
   <string name="account_calendar">kalender</string>
   <string name="account_no_webcal_handler_found">Fant ingen programmer med støtte for Webcal</string>
-  <string name="account_install_icsx5">Installer ICSx⁵</string>
+  <string name="account_install_icsx5">Installer Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Legg til konto</string>
   <string name="login_login">Logg inn</string>
@@ -160,7 +160,7 @@
   <string name="webdav_add_mount_username">Brukernavn</string>
   <string name="webdav_add_mount_password">Passord</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵-tilganger</string>
+  <string name="sync_error_permissions">Twake Sync-tilganger</string>
   <string name="sync_error_permissions_text">Ytterligere tilganger kreves</string>
   <string name="sync_error_io">Nettverk- og I/O-feil - %s</string>
   <string name="sync_error_http_dav">HTTP-tjenerfeil - %s</string>

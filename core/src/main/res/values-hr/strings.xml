@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Račun (više) ne postoji</string>
-  <string name="account_title_address_book">DAVx⁵ Adresar</string>
+  <string name="account_title_address_book">Twake Sync Adresar</string>
   <string name="dialog_enable">Omogući</string>
   <string name="help">Pomoć</string>
   <string name="share">Dijeli</string>
@@ -138,7 +138,7 @@
   <string name="account_calendar">kalendar</string>
   <string name="account_only_personal">Prikaži samo osobno</string>
   <string name="account_no_webcal_handler_found">Aplikacija sa Webcal mogućnostima nije pronađena</string>
-  <string name="account_install_icsx5">Instaliraj ICSx⁵</string>
+  <string name="account_install_icsx5">Instaliraj Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Dodaj račun</string>
   <string name="login_login">Prijava</string>
@@ -263,7 +263,7 @@
   <string name="webdav_add_mount_username">Korisničko ime</string>
   <string name="webdav_add_mount_password">Lozinka</string>
   <!--sync-->
-  <string name="sync_error_permissions">DAVx⁵ dopuštenja</string>
+  <string name="sync_error_permissions">Twake Sync dopuštenja</string>
   <string name="sync_error_permissions_text">Dodatna dopuštenja su potrebna</string>
   <string name="sync_error_tasks_too_old">%s prestar</string>
   <string name="sync_error_tasks_required_version">Najmanja potrebno verzija: %1$s</string>

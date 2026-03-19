@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Аккаунт (больше) не существует</string>
-  <string name="account_title_address_book">Адресная книга DAVx⁵</string>
+  <string name="account_title_address_book">Адресная книга Twake Sync</string>
   <string name="account_prefs_use_app">Не меняйте аккаунт здесь! Вместо этого используйте приложение для управления учетными записями.</string>
   <string name="dialog_delete">Удалить</string>
   <string name="dialog_remove">Удалить</string>
@@ -127,7 +127,7 @@
   <string name="navigation_drawer_support_project">Поддержать проект</string>
   <string name="navigation_drawer_contribute">Как внести свой вклад</string>
   <string name="navigation_drawer_privacy_policy">Политика конфиденциальности</string>
-  <string name="account_list_welcome">Добро пожаловать в DAVx⁵!</string>
+  <string name="account_list_welcome">Добро пожаловать в Twake Sync!</string>
   <string name="account_list_empty">Подключитесь к вашему серверу и синхронизируйте календари и контакты.</string>
   <string name="accounts_sync_all">Синхронизировать все аккаунты</string>
   <!--Sync warnings-->
@@ -233,7 +233,7 @@
   <string name="account_refresh_collections">Обновить список</string>
   <string name="account_webcal_external_app">Подписки Webcal можно синхронизировать с внешними приложениями.</string>
   <string name="account_no_webcal_handler_found">Не найдено приложение, поддерживающее WebCal</string>
-  <string name="account_install_icsx5">Установить ICSx⁵</string>
+  <string name="account_install_icsx5">Установить Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Добавить аккаунт</string>
   <string name="login_privacy_hint"><![CDATA[Все данные будут передаваться только между вашим сервером и вашим устройством. %1$s больше никуда их не отправляет. См. <a href="%2$s">Политику конфиденциальности</a>.]]></string>
@@ -464,7 +464,7 @@
   <string name="webdav_notification_upload">Выгрузка файла WebDAV</string>
   <string name="webdav_provider_root_title">Точка монтирования WebDAV</string>
   <!--sync-->
-  <string name="sync_error_permissions">Разрешения DAVx⁵</string>
+  <string name="sync_error_permissions">Разрешения Twake Sync</string>
   <string name="sync_error_permissions_text">Требуются дополнительные разрешения</string>
   <string name="sync_error_tasks_too_old">Приложение %s устарело</string>
   <string name="sync_error_tasks_required_version">Минимально необходимая версия: %1$s</string>

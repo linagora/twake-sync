@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="account_invalid">Akun tidak ada (lagi)</string>
-    <string name="account_title_address_book">Buku alamat DAVx⁵</string>
+    <string name="account_title_address_book">Buku alamat Twake Sync</string>
     <string name="account_prefs_use_app">Jangan ubah akun di sini! Gunakan aplikasi secara langsung untuk mengelola akun.</string>
     <string name="dialog_delete">Hapus</string>
     <string name="dialog_remove">Hapus</string>
@@ -125,7 +125,7 @@
     <string name="navigation_drawer_support_project">Dukung proyek ini</string>
     <string name="navigation_drawer_contribute">Cara berkontribusi</string>
     <string name="navigation_drawer_privacy_policy">Kebijakan privasi</string>
-    <string name="account_list_welcome">Selamat datang di DAVx⁵!</string>
+    <string name="account_list_welcome">Selamat datang di Twake Sync!</string>
     <string name="account_list_empty">Hubungkan ke server Anda dan jaga agar kalender serta kontak Anda tetap tersinkronisasi.</string>
     <string name="accounts_sync_all">Sinkronkan semua akun</string>
     <string name="sync_warning_no_notification_permission">Notifikasi dinonaktifkan. Anda tidak akan diberi tahu tentang kesalahan sinkronisasi.</string>
@@ -215,7 +215,7 @@
     <string name="account_refresh_collections">Segarkan daftar</string>
     <string name="account_webcal_external_app">Langganan Webcal dapat disinkronkan dengan aplikasi eksternal.</string>
     <string name="account_no_webcal_handler_found">Tidak ditemukan aplikasi yang mendukung Webcal</string>
-    <string name="account_install_icsx5">Instal ICSx⁵</string>
+    <string name="account_install_icsx5">Instal Twake Sync ICS</string>
     <string name="login_title">Tambahkan akun</string>
     <string name="login_privacy_hint"><![CDATA[Semua data hanya akan ditransfer antara server Anda dan perangkat Anda. %1$s tidak akan mengirimkannya ke tempat lain. Lihat <a href="%2$s">kebijakan privasi</a>.]]></string>
     <string name="login_generic_login">Login umum</string>
@@ -419,7 +419,7 @@
     <string name="webdav_notification_download">Mengunduh file WebDAV</string>
     <string name="webdav_notification_upload">Mengunggah file WebDAV</string>
     <string name="webdav_provider_root_title">Mount WebDAV</string>
-    <string name="sync_error_permissions">Izin DAVx⁵</string>
+    <string name="sync_error_permissions">Izin Twake Sync</string>
     <string name="sync_error_permissions_text">Izin tambahan diperlukan</string>
     <string name="sync_error_tasks_too_old">%s terlalu lama</string>
     <string name="sync_error_tasks_required_version">Versi minimum yang diperlukan: %1$s</string>

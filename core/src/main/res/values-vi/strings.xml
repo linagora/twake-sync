@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Tài khoản không tồn tại (nữa)</string>
-  <string name="account_title_address_book">Sổ địa chỉ của DAVx⁵</string>
+  <string name="account_title_address_book">Sổ địa chỉ của Twake Sync</string>
   <string name="dialog_remove">Xóa</string>
   <string name="dialog_deny">Hủy</string>
   <string name="dialog_enable">Bật</string>
@@ -168,7 +168,7 @@
   <string name="account_journal">nhật ký</string>
   <string name="account_only_personal">Chỉ hiện cá nhân</string>
   <string name="account_no_webcal_handler_found">Không tìm thấy ứng dụng nào có khả năng xử lý Webcal</string>
-  <string name="account_install_icsx5">Cài đặt ICSx⁵</string>
+  <string name="account_install_icsx5">Cài đặt Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Thêm tài khoản</string>
   <string name="login_login">Đăng nhập</string>
@@ -310,7 +310,7 @@
   <string name="webdav_notification_upload">Đang tải lên tệp WebDAV</string>
   <string name="webdav_provider_root_title">Nơi gắn WebDAV</string>
   <!--sync-->
-  <string name="sync_error_permissions">Quyền của DAVx⁵</string>
+  <string name="sync_error_permissions">Quyền của Twake Sync</string>
   <string name="sync_error_permissions_text">Yêu cầu quyền bổ sung</string>
   <string name="sync_error_tasks_too_old">%s quá cũ</string>
   <string name="sync_error_tasks_required_version">Phiên bản tối thiểu được yêu cầu: %1$s</string>

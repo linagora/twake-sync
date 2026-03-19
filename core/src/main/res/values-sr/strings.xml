@@ -168,7 +168,7 @@
   <string name="account_journal">журнал</string>
   <string name="account_only_personal">Прикажи само личне</string>
   <string name="account_no_webcal_handler_found">Нема апликације за Вебкал</string>
-  <string name="account_install_icsx5">Инсталирај ICSx⁵</string>
+  <string name="account_install_icsx5">Инсталирај Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Додај налог</string>
   <string name="login_login">Пријава</string>

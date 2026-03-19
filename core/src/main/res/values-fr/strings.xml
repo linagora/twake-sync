@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!--common strings-->
   <string name="account_invalid">Le compte n’existe plus (supprimé)</string>
-  <string name="account_title_address_book">Carnet d\'adresses DAVx⁵</string>
+  <string name="account_title_address_book">Carnet d\'adresses Twake Sync</string>
   <string name="account_prefs_use_app">Ne modifiez pas votre compte ici ! Utilisez plutôt l\'application pour configurer directement votre compte.</string>
   <string name="dialog_delete">Supprimer</string>
   <string name="dialog_remove">Retirer</string>
@@ -118,7 +118,7 @@
   <string name="navigation_drawer_support_project">Soutenir le projet</string>
   <string name="navigation_drawer_contribute">Comment contribuer</string>
   <string name="navigation_drawer_privacy_policy">Politique de confidentialité</string>
-  <string name="account_list_welcome">Bienvenue sur DAVx⁵!</string>
+  <string name="account_list_welcome">Bienvenue sur Twake Sync!</string>
   <string name="account_list_empty">Connectez-vous à votre serveur pour garder vos calendriers et contacts synchronisés.</string>
   <string name="accounts_sync_all">Synchroniser tous les comptes</string>
   <!--Sync warnings-->
@@ -213,7 +213,7 @@
   <string name="account_refresh_collections">Rafraîchir la liste</string>
   <string name="account_webcal_external_app">Les abonnements Webcal peuvent être synchronisés avec des applications tierces.</string>
   <string name="account_no_webcal_handler_found">Aucune application compatible WebCal</string>
-  <string name="account_install_icsx5">Installer ICSx⁵</string>
+  <string name="account_install_icsx5">Installer Twake Sync ICS</string>
   <!--AddAccountActivity-->
   <string name="login_title">Ajouter un compte</string>
   <string name="login_privacy_hint"><![CDATA[Toutes les données ne seront transférées qu\'entre votre serveur et votre appareil. %1$sne les enverra nulle part ailleur. Consultez<a href="%2$s">la politique de confidentialité</a>.]]></string>
@@ -415,7 +415,7 @@
   <string name="webdav_notification_upload">Téléversement du fichier WebDAV</string>
   <string name="webdav_provider_root_title">Point de montage WebDAV</string>
   <!--sync-->
-  <string name="sync_error_permissions">Autorisations DAVx⁵</string>
+  <string name="sync_error_permissions">Autorisations Twake Sync</string>
   <string name="sync_error_permissions_text">Autorisations supplémentaires demandées</string>
   <string name="sync_error_tasks_too_old">%s trop ancien</string>
   <string name="sync_error_tasks_required_version">Version minimale requise : %1$s</string>
