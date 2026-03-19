@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Twake Sync branding overrides of translations pulled from l10n -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="account_title_address_book">Twake Sync Osoitekirja</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Twake Sync branding: default values of the translations in values-*/strings_twake.xml (same as in core) -->
+<resources>
+    <string name="account_install_icsx5">Install Twake Sync ICS</string>
+    <string name="account_list_welcome">Welcome to Twake Sync!</string>
+    <string name="account_title_address_book">Twake Sync Address book</string>
+    <string name="navigation_drawer_about">About / License</string>
+    <string name="sync_error_permissions">Twake Sync permissions</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Twake Sync branding overrides of translations pulled from l10n -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="account_title_address_book">Twake Sync 通讯录</string>
+    <string name="account_list_welcome">欢迎来到 Twake Sync！</string>
+    <string name="account_install_icsx5">安装 Twake Sync ICS</string>
+    <string name="sync_error_permissions">Twake Sync 权限</string>
+</resources>

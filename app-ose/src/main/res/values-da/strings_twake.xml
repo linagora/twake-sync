@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Twake Sync branding overrides of translations pulled from l10n -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="account_title_address_book">Twake Sync adressebog</string>
+    <string name="account_install_icsx5">Installere Twake Sync ICS</string>
+    <string name="sync_error_permissions">Twake Sync-rettigheder</string>
+</resources>
