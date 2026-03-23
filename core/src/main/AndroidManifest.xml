@@ -301,8 +301,8 @@
         <package android:name="org.dmfs.tasks" />
         <package android:name="org.tasks" />
 
-        <!-- ICSx5 for Webcal feeds -->
-        <package android:name="at.bitfire.icsdroid"/>
+        <!-- ICS apps for Webcal feeds -->
+        <package android:name="com.twake.android.sync.ics"/>
 
         <!-- apps that interact with contact, calendar, task data (for debug info) -->
         <intent>
