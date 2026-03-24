@@ -23,7 +23,9 @@ android {
     defaultConfig {
         applicationId = "com.twake.android.sync"
 
-        // versionCode and versionName are defined in the build-logic submodule (AppVersion)
+        // versionCode is defined in the build-logic submodule (AppVersion); Twake Sync uses date-based version names
+        versionName = "2026.03.24.01"
+
         base.archivesName = "twake-sync-$versionCode-$versionName"
 
         /* Android prevents having two apps installed with the same provider authority name. In that case,
