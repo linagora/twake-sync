@@ -28,7 +28,7 @@ android {
         applicationId = "com.twake.android.sync"
 
         versionCode = 405110000
-        versionName = "4.5.11-alpha.1"
+        versionName = "2026.03.24.01"
 
         base.archivesName = "twake-sync-$versionCode-$versionName"
 
