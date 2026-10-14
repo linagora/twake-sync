@@ -16,6 +16,7 @@ import at.bitfire.davdroid.resource.local.LocalAddressBookStore
 import at.bitfire.davdroid.resource.remote.CardDavCollection
 import at.bitfire.synctools.storage.contacts.AddressContract.asSyncAdapter
 import at.bitfire.synctools.util.setAndVerifyUserData
+import at.bitfire.synctools.vcard.GroupMethod
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -120,19 +121,41 @@ class AddressBookSyncer @AssistedInject constructor(
         addressBook: LocalAddressBook,
         provider: ContentProviderClient
     ) {
+        val groupMethod = settings.groupMethod.name
+        val previousGroupMethod = withContext(ioDispatcher) {
+            accountManager.get().getUserData(addressBook.addressBookAccount, PREVIOUS_GROUP_METHOD)
+        }
+
+        if (previousGroupMethod == GroupMethod.GROUP_VCARDS.name &&
+            settings.groupMethod == GroupMethod.CATEGORIES &&
+            !addressBook.readOnly
+        ) {
+            /* Convert group vCards to categories without losing data: groups and memberships are kept,
+            members are uploaded with CATEGORIES. Group vCards on the server are then ignored (see CategoriesStrategy). */
+            logger.info("Group method changed from $previousGroupMethod to $groupMethod, converting local groups to categories")
+            addressBook.convertGroupVCardsToCategories()
+            withContext(ioDispatcher) {
+                // reset sync state so that all remote vCards are listed again
+                addressBook.syncState = null
+                accountManager.get().setAndVerifyUserData(addressBook.addressBookAccount, PREVIOUS_GROUP_METHOD, groupMethod)
+            }
+            return
+        }
+
         withContext(ioDispatcher) {
-            handleGroupMethodChangeBlocking(addressBook, provider)
+            handleGroupMethodChangeBlocking(addressBook, provider, previousGroupMethod)
         }
     }
 
     private fun handleGroupMethodChangeBlocking(
         addressBook: LocalAddressBook,
-        provider: ContentProviderClient
+        provider: ContentProviderClient,
+        previousGroupMethod: String?
     ) {
         val groupMethod = settings.groupMethod.name
 
         val accountManager = accountManager.get()
-        accountManager.getUserData(addressBook.addressBookAccount, PREVIOUS_GROUP_METHOD)?.let { previousGroupMethod ->
+        previousGroupMethod?.let {
             if (previousGroupMethod != groupMethod) {
                 logger.info("Group method changed, deleting all local contacts/groups")
 

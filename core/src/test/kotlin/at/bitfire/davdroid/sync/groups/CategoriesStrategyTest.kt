@@ -6,6 +6,7 @@ package at.bitfire.davdroid.sync.groups
 
 import at.bitfire.davdroid.resource.local.LocalAddressBook
 import at.bitfire.davdroid.resource.local.LocalGroup
+import at.bitfire.synctools.mapping.contacts.Contact
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -15,6 +16,9 @@ import io.mockk.verify
 import junit.framework.AssertionFailedError
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -62,6 +66,30 @@ class CategoriesStrategyTest {
 
         verify { group.markMembersDirty() }
         coVerify { group.clearDirty(Optional.empty(), null) }
+    }
+
+
+    // verifyContactBeforeSaving
+
+    @Test
+    fun `verifyContactBeforeSaving() ignores group vCard`() {
+        val group = Contact(displayName = "QA Group", group = true, members = mutableSetOf("carol-uid"))
+        assertFalse(strategy.verifyContactBeforeSaving(group))
+    }
+
+    @Test
+    fun `verifyContactBeforeSaving() accepts individual contact`() {
+        val contact = Contact(displayName = "Carol Seed")
+        contact.categories += "QA Group"
+        assertTrue(strategy.verifyContactBeforeSaving(contact))
+        assertEquals(listOf("QA Group"), contact.categories)
+    }
+
+    @Test
+    fun `verifyContactBeforeSaving() strips members from individual contact`() {
+        val contact = Contact(displayName = "Carol Seed", members = mutableSetOf("other-uid"))
+        assertTrue(strategy.verifyContactBeforeSaving(contact))
+        assertTrue(contact.members.isEmpty())
     }
 
 }

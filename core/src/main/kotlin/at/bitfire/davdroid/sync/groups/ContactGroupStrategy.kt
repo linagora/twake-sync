@@ -20,7 +20,13 @@ interface ContactGroupStrategy {
      */
     suspend fun beforeUploadDirty() {}
 
-    fun verifyContactBeforeSaving(contact: Contact)
+    /**
+     * Verifies/adapts a received vCard before it's saved to the local address book.
+     *
+     * @return whether the vCard shall be saved locally (`false`: ignore it)
+     */
+    fun verifyContactBeforeSaving(contact: Contact): Boolean
+
     suspend fun postProcess()
 
 }

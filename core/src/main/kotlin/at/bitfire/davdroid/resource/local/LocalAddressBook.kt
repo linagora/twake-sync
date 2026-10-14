@@ -21,6 +21,7 @@ import at.bitfire.davdroid.settings.AccountSettingsFactory
 import at.bitfire.davdroid.sync.SyncDataType
 import at.bitfire.davdroid.sync.adapter.SyncFrameworkIntegration
 import at.bitfire.synctools.mapping.contacts.Contact
+import at.bitfire.synctools.storage.BatchOperation
 import at.bitfire.synctools.storage.LocalStorageException
 import at.bitfire.synctools.storage.contacts.AddressContract.GroupColumns
 import at.bitfire.synctools.storage.contacts.AddressContract.RawContactColumns
@@ -365,6 +366,65 @@ open class LocalAddressBook @AssistedInject constructor(
 
 
     /* special group operations */
+
+    /**
+     * Converts the local groups of this address book from [GroupMethod.GROUP_VCARDS] to
+     * [GroupMethod.CATEGORIES] without losing group memberships:
+     *
+     * - groups which have been synchronized as separate group vCards are detached from their vCards
+     *   (file name, UID, ETag, pending members are removed), so that they become plain category
+     *   groups (identified by their title) which keep their current members;
+     * - all members of these groups are marked as dirty, so that they will be uploaded with the
+     *   respective `CATEGORIES`;
+     * - the ETags of all other (non-dirty) contacts are forgotten, so that they will be downloaded
+     *   again and their `CATEGORIES` (which are ignored in [GroupMethod.GROUP_VCARDS] mode) are applied.
+     *
+     * The group vCards themselves are kept on the server (they're ignored in [GroupMethod.CATEGORIES] mode).
+     *
+     * @throws LocalStorageException on content provider errors
+     */
+    suspend fun convertGroupVCardsToCategories() {
+        withContext(Dispatchers.IO) {
+            val vCardGroups = "${GroupColumns.FILENAME} IS NOT NULL"
+
+            // collect members of all groups which have been synchronized as group vCards
+            val memberIds = mutableSetOf<Long>()
+            ab.queryGroupRows(arrayOf(Groups._ID), vCardGroups, null).collect { row ->
+                memberIds += getContactIdsByGroupMembership(row.getAsLong(Groups._ID))
+            }
+            logger.info("Converting group vCards to categories; marking ${memberIds.size} group member(s) as dirty")
+
+            val batch = ContactsBatchOperation(ab.provider)
+
+            // mark members as dirty so that they're uploaded with CATEGORIES (keep their ETags for If-Match);
+            // reset hash code so that the Android 7 dirty verifier doesn't reset the DIRTY flag again
+            for (memberId in memberIds)
+                batch += BatchOperation.CpoBuilder
+                    .newUpdate(ab.rawContactSyncUri(memberId))
+                    .withValue(RawContacts.DIRTY, 1)
+                    .withValue(RawContactColumns.HASHCODE, null)
+
+            // forget ETags of non-dirty contacts so that they're downloaded again (with their CATEGORIES)
+            ab.updateRawContactRows(contentValuesOf(RawContactColumns.ETAG to null), "NOT ${RawContacts.DIRTY}", null, batch)
+
+            // detach groups from their group vCards so that they become plain category groups
+            ab.updateGroups(
+                contentValuesOf(
+                    GroupColumns.FILENAME to null,
+                    GroupColumns.UID to null,
+                    GroupColumns.ETAG to null,
+                    GroupColumns.PENDING_MEMBERS to null
+                ),
+                vCardGroups, null, batch
+            )
+
+            try {
+                batch.commit()
+            } catch (e: RemoteException) {
+                throw LocalStorageException("Couldn't convert group vCards to categories", e)
+            }
+        }
+    }
 
     /**
      * Processes all groups with pending memberships: applies them (if possible) to keep cached

@@ -30,12 +30,21 @@ class CategoriesStrategy(val addressBook: LocalAddressBook): ContactGroupStrateg
         }
     }
 
-    override fun verifyContactBeforeSaving(contact: Contact) {
-        if (contact.group || contact.members.isNotEmpty()) {
-            logger.warning("Received group vCard although group method is CATEGORIES. Saving as regular contact")
-            contact.group = false
+    /**
+     * Group vCards (`KIND:group` / `X-ADDRESSBOOKSERVER-KIND:group`) are ignored, because in CATEGORIES
+     * mode group memberships are taken from the `CATEGORIES` of the member contacts. Saving them as
+     * regular contacts would create fake contacts named after the group.
+     */
+    override fun verifyContactBeforeSaving(contact: Contact): Boolean {
+        if (contact.group) {
+            logger.info("Ignoring group vCard because group method is CATEGORIES: ${contact.displayName}")
+            return false
+        }
+        if (contact.members.isNotEmpty()) {
+            logger.warning("Received contact with group members although group method is CATEGORIES. Ignoring members")
             contact.members.clear()
         }
+        return true
     }
 
     override suspend fun postProcess() {
