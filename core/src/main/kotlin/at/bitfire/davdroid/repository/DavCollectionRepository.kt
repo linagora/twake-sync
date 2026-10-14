@@ -21,8 +21,11 @@ import at.bitfire.davdroid.db.AppDatabase
 import at.bitfire.davdroid.db.Collection
 import at.bitfire.davdroid.db.CollectionType
 import at.bitfire.davdroid.db.HomeSet
+import at.bitfire.davdroid.di.qualifier.ApplicationScope
 import at.bitfire.davdroid.network.HttpClientBuilder
 import at.bitfire.davdroid.servicedetection.RefreshCollectionsWorker
+import at.bitfire.davdroid.sync.SyncDataType
+import at.bitfire.davdroid.sync.worker.SyncWorkerManager
 import at.bitfire.davdroid.util.DavUtils
 import at.bitfire.synctools.icalendar.componentListOf
 import at.bitfire.synctools.icalendar.propertyListOf
@@ -31,6 +34,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.Component
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory
@@ -48,12 +53,14 @@ import javax.inject.Inject
  */
 class DavCollectionRepository @Inject constructor(
     private val accountRepository: AccountRepository,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
     private val db: AppDatabase,
     private val logger: Logger,
     private val httpClientBuilder: HttpClientBuilder,
     private val productIds: Lazy<ProductIds>,
-    private val serviceRepository: DavServiceRepository
+    private val serviceRepository: DavServiceRepository,
+    private val syncWorkerManager: Lazy<SyncWorkerManager>
 ) {
 
     private val dao = db.collectionDao()
@@ -322,10 +329,45 @@ class DavCollectionRepository @Inject constructor(
      */
     fun delete(collection: Collection) {
         dao.deleteBlocking(collection)
+
+        if (collection.sync)
+            applicationScope.launch {
+                removeLocalCollection(collection)
+            }
     }
 
 
     // helpers
+
+    /**
+     * Requests a sync of the data types of a deleted collection, so that the [at.bitfire.davdroid.sync.Syncer]
+     * removes the corresponding local collection (calendar, address book, …) right away, and not only on
+     * the next regular sync.
+     */
+    private suspend fun removeLocalCollection(collection: Collection) {
+        val dataTypes = when (collection.type) {
+            Collection.TYPE_ADDRESSBOOK ->
+                listOf(SyncDataType.CONTACTS)
+            Collection.TYPE_CALENDAR ->
+                listOfNotNull(
+                    SyncDataType.EVENTS.takeIf { collection.supportsVEVENT != false },
+                    SyncDataType.TASKS.takeIf { collection.supportsVTODO != false || collection.supportsVJOURNAL != false }
+                )
+            else ->     // webcal subscriptions are synchronized by an external app
+                emptyList()
+        }
+        if (dataTypes.isEmpty())
+            return
+
+        try {
+            val service = serviceRepository.get(collection.serviceId) ?: return
+            val accountId = accountRepository.getAccountIdFromName(service.accountName)
+            for (dataType in dataTypes)
+                syncWorkerManager.get().enqueueOneTime(accountId, dataType)
+        } catch (e: Exception) {
+            logger.log(Level.WARNING, "Couldn't request removal of local collection ${collection.id}", e)
+        }
+    }
 
     /**
      * Creates a new collection on the server using the specified account and URL.
