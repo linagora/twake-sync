@@ -5,16 +5,13 @@
 package at.bitfire.davdroid.ui.about
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -28,16 +25,12 @@ fun TranslationsTab(
     Column(Modifier
         .padding(8.dp)
         .verticalScroll(rememberScrollState())) {
-            Column {
-                Translations_Engage(
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Translations_Translators(
-                    weblateTranslators,
-                    transifexTranslators,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
+            // Twake Sync: no "Help Translating" button, translations are managed by the DAVx5 Weblate project
+            Translations_Translators(
+                weblateTranslators,
+                transifexTranslators,
+                modifier = Modifier
+            )
     }
 }
 
@@ -75,15 +68,6 @@ fun Translations_Translators(
             style = MaterialTheme.typography.bodyMedium
         )
     }
-}
-
-@Composable
-fun Translations_Engage(modifier: Modifier = Modifier) {
-    val uriHandler = LocalUriHandler.current
-    Button(
-        modifier = modifier,
-        onClick = { uriHandler.openUri("https://hosted.weblate.org/engage/davx5/") }
-    ) { Text(stringResource(R.string.about_translations_contribute)) }
 }
 
 @Composable
