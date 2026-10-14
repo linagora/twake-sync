@@ -184,6 +184,61 @@ adb shell am start -W -n "$PACKAGE/at.bitfire.davdroid.ui.setup.LoginActivity" \
 maestro --device "$ANDROID_SERIAL" test -e ACCOUNT_NAME="$owner@open-paas.org" "$SCRIPT_DIR/sign-in.yaml"
 adb shell am force-stop dev.mobile.maestro.test 2>/dev/null || true
 
+# bounds <text> [<max left>]: "left top right bottom" of the first view of the screen showing
+# exactly <text> (whose left edge is below <max left>), nothing when there is none
+bounds() {
+  adb exec-out uiautomator dump /dev/tty 2>/dev/null | tr '>' '\n' |
+    grep -F "text=\"$1\"" | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' |
+    awk -v max="${2:-100000}" '$1 < max {print; exit}'
+}
+
+# wait_for <text>: true once <text> is on the screen, within 30 s
+wait_for() {
+  for _ in $(seq 1 15); do
+    [ -n "$(bounds "$1")" ] && return 0
+    sleep 2
+  done
+  return 1
+}
+
+# tap <text>: taps the middle of <text>
+tap() {
+  local b
+  read -r -a b <<<"$(bounds "$1")"
+  adb shell input tap $(((b[0] + b[2]) / 2)) $(((b[1] + b[3]) / 2))
+}
+
+# enable <collection title>: turns on the sync switch at the right end of the collection's row.
+# The switch has no text nor id of its own: Maestro cannot select it.
+enable() {
+  local b width
+  wait_for "$1" || { echo "    no collection '$1' on the screen" >&2; return 1; }
+  # the title of the collection, at the left of the row, not its type chips
+  read -r -a b <<<"$(bounds "$1" 100)"
+  width="$(adb shell wm size | sed -n 's/.*: \([0-9]*\)x.*/\1/p' | tail -1)"
+  adb shell input tap $((width * 9 / 10)) $(((b[1] + b[3]) / 2))
+}
+
+echo "==> Synchronising the default calendar and the contacts of $owner"
+# The account screen is open; its collection list may still be empty
+wait_for '#default' || { tap 'Refresh list'; wait_for '#default'; } ||
+  { echo "The account screen does not list the calendar #default" >&2; exit 1; }
+enable '#default'
+tap CardDAV
+enable contacts
+tap 'Synchronize now'
+for _ in $(seq 1 30); do
+  synced="$(adb shell content query --uri content://com.android.calendar/events --projection title 2>/dev/null |
+    grep -c 'QA seed' || true)"
+  synced=$((synced + $(adb shell content query --uri content://com.android.contacts/raw_contacts \
+    --projection display_name 2>/dev/null | grep -c 'Carol Seed' || true)))
+  [ "$synced" -ge 3 ] && break
+  sleep 2
+done
+# Not fatal: a broken sync is for the QA run to report
+[ "${synced:-0}" -ge 3 ] && echo "    the seeded events and contact are on the device" ||
+  echo "    WARNING: the seeded events and contact did not all reach the device within a minute" >&2
+
 cat <<INFO
 
 ==> QA environment '$QA_PROJECT' is up
