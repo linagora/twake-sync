@@ -132,7 +132,8 @@ class LoginScreenViewModel @AssistedInject constructor(
                 finish = true
 
             Page.LoginDetails ->
-                if (loginTypesProvider.maybeNonInteractive)
+                // don't show the login type page when it has been skipped (not part of the Twake Sync flow)
+                if (skipLoginTypePage || loginTypesProvider.maybeNonInteractive)
                     finish = true
                 else
                     page = Page.LoginType
