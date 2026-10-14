@@ -47,6 +47,10 @@ fun HomeSetSelection(
                 homeSets.firstOrNull()?.let(onSelectHomeSet)
         }
 
+        // Twake Sync: nothing to choose with a single home set, and its name is usually an opaque server id
+        if (homeSets.size <= 1)
+            return@Column
+
         var expanded by remember { mutableStateOf(false) }
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -54,7 +58,7 @@ fun HomeSetSelection(
         ) {
             OutlinedTextField(
                 label = { Text(stringResource(R.string.create_collection_home_set)) },
-                value = homeSet?.title() ?: "",
+                value = homeSet?.let { it.displayName ?: it.url.encodedPath } ?: "",
                 onValueChange = { /* read-only */ },
                 readOnly = true,
                 trailingIcon = {
