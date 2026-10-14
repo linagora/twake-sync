@@ -1,0 +1,33 @@
+appId: com.twake.android.sync
+---
+# Adds the account ${ACCOUNT_NAME} (the email address of the user) from the "Login with URL and user name" screen, prefilled by
+# the intent start.sh sends first:
+#   adb shell am start -n com.twake.android.sync/at.bitfire.davdroid.ui.setup.LoginActivity \
+#     -a android.intent.action.VIEW -d 'http://<user>:<password>@10.0.2.2:<port>/'
+#   maestro --device <serial> test -e ACCOUNT_NAME=<user>@open-paas.org sign-in.yaml
+# An emulator under load can raise "isn't responding" over the screen.
+- repeat:
+    times: 6
+    commands:
+      - runFlow:
+          when:
+            visible: 'Wait'
+          commands:
+            - tapOn: 'Wait'
+      - waitForAnimationToEnd:
+          timeout: 5000
+- extendedWaitUntil:
+    visible: 'Login with URL and user name'
+    timeout: 60000
+- tapOn: 'Login'
+# Service discovery, then the account details page
+- extendedWaitUntil:
+    visible: 'Account name'
+    timeout: 120000
+# Prefilled with the email address the server gives: tapping the field would put the cursor in
+# the middle of it
+- assertVisible: ${ACCOUNT_NAME}
+- tapOn: 'Finish'
+- extendedWaitUntil:
+    notVisible: 'Finish'
+    timeout: 60000
