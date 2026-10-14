@@ -28,6 +28,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -196,6 +197,21 @@ class LocalAddressBookStoreTest {
         val addrBook = localAddressBookStore.create(provider, collection)!!
         assertEquals(Account("funnyfriends (Test Account) #1", addressBookAccountType), addrBook.addressBookAccount)
         assertFalse(addrBook.readOnly)
+    }
+
+
+    @Test
+    fun test_deleteByAccount() {
+        val otherAddressBookAccount = Account("Other Address Book", addressBookAccountType)
+        every { accountManager.getAccountsByType(addressBookAccountType) } returns arrayOf(addressBookAccount, otherAddressBookAccount)
+        every { addressBookAccountProperties.getAppAccount(addressBookAccount) } returns accountId
+        every { addressBookAccountProperties.getAppAccount(otherAddressBookAccount) } returns
+                LegacyAccount(Account("Another Unrelated Account", accountId.androidAccount.type))
+
+        localAddressBookStore.deleteByAccount(accountId)
+
+        verify(exactly = 1) { accountManager.removeAccountExplicitly(addressBookAccount) }
+        verify(exactly = 0) { accountManager.removeAccountExplicitly(otherAddressBookAccount) }
     }
 
 

@@ -229,6 +229,19 @@ class LocalAddressBookStore @Inject constructor(
     }
 
     /**
+     * Deletes all address books (= address book accounts) that belong to the given account.
+     *
+     * @param accountId [AccountId] of the app account that owns the address books.
+     */
+    fun deleteByAccount(accountId: AccountId) {
+        val accountManager = accountManager.get()
+        for (addressBookAccount in getAddressBookAccounts(accountId)) {
+            logger.info("Deleting address book account $addressBookAccount of $accountId")
+            accountManager.removeAccountExplicitly(addressBookAccount)
+        }
+    }
+
+    /**
      * Returns all address book accounts that belong to the given account.
      *
      * @param accountId [AccountId] of the app account that owns the address books.
