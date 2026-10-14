@@ -1,0 +1,13 @@
+# Added by start.sh to the compose file of the Twake Calendar e2e stack: publishes Sabre on
+# 127.0.0.1:$QA_DAV_PORT, where the emulator reaches it as http://10.0.2.2:$QA_DAV_PORT. The stack's
+# own proxy answers only to the host names "dav" and "api": Sabre is reached directly instead.
+services:
+  dav-gateway:
+    image: alpine/socat:1.8.0.3
+    command: TCP-LISTEN:80,fork,reuseaddr TCP:esn_sabre:80
+    ports:
+      - 127.0.0.1:${QA_DAV_PORT:-18990}:80
+    depends_on:
+      - sabre_dav
+    networks:
+      - tcalendar-e2e
