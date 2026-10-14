@@ -130,7 +130,7 @@ class DebugInfoViewModel @AssistedInject constructor(
         try {
             uiState = uiState.copy(zipInProgress = true)
 
-            val file = File(debugDirectory.getOrCreate(), "davx5-debug.zip")
+            val file = File(debugDirectory.getOrCreate(), "twake-sync-debug.zip")
             logger.fine("Writing debug info to ${file.absolutePath}")
             ZipOutputStream(file.outputStream().buffered()).use { zip ->
                 zip.setLevel(9)
