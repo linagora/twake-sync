@@ -162,6 +162,11 @@ abstract class Syncer<StoreType: LocalDataStore<CollectionType>, CollectionType:
                 )
                 dataStore.delete(localCollection)
                 updatedLocalCollections -= localCollection
+
+                // The collection won't be synced anymore, so a sync error notification for it would never be dismissed
+                localCollection.dbCollectionId?.let { collectionId ->
+                    syncNotificationManager.dismissCollectionError(collectionId)
+                }
             } else {
                 // Collection exists locally, update local collection and remove it from "to be created" map
                 logger.log(

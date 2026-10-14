@@ -46,6 +46,7 @@ class SyncerTest {
     val dataStore: LocalTestStore = mockk(relaxed = true)
     val provider: ContentProviderClient = mockk(relaxed = true)
     val syncResult = SyncResult()
+    val syncNotificationManager: SyncNotificationManager = mockk(relaxed = true)
 
     private val accountId = LegacyAccount(Account("test", "test"))
 
@@ -55,7 +56,9 @@ class SyncerTest {
         /* Dependencies that are only used by invoke(). They have to be set before the spy is created, because
         the spy only gets a copy of the fields, while the lazy syncNotificationManager still resolves them
         on the original object. */
-        syncNotificationManagerFactory = mockk(relaxed = true)
+        syncNotificationManagerFactory = mockk {
+            every { create(any()) } returns syncNotificationManager
+        }
         syncValidator = Optional.empty()
     }
 
@@ -93,6 +96,9 @@ class SyncerTest {
         val localCollections = mutableListOf(localCollection)
         val result = syncer.updateCollections(mockk(), localCollections, emptyMap())
         verify(exactly = 1) { dataStore.delete(localCollection) }
+
+        // Should dismiss a (stale) sync error notification of the deleted collection
+        verify(exactly = 1) { syncNotificationManager.dismissCollectionError(0L) }
 
         // Updated local collection list should be empty
         assertTrue(result.isEmpty())
