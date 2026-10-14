@@ -35,7 +35,6 @@ fun LoginScreen(
     initialLoginInfo: LoginInfo = LoginInfo(),
     skipLoginTypePage: Boolean = false,
     initialLoginType: LoginType = UrlLogin,
-    onNavUp: () -> Unit,
     onFinish: (AccountId?) -> Unit
 ) {
     val model: LoginScreenViewModel = hiltViewModel { factory: LoginScreenViewModel.Factory ->
@@ -57,7 +56,8 @@ fun LoginScreen(
     LoginScreenContent(
         page = model.page,
         helpUri = loginType.helpUrl,
-        onNavUp = onNavUp,
+        // toolbar "up" goes back one page like the system back key, instead of leaving the whole login
+        onNavUp = model::navBack,
         onFinish = onFinish
     )
 }
