@@ -33,6 +33,12 @@ for pair in tcalendar-e2e:Dockerfile.tcalendar ldap-e2e:Dockerfile.ldap \
   fi
 done
 
+# compose up only pulls the images that are missing: refresh the floating tags of the stack and
+# the curl start.sh runs. A local copy is as good when the registry does not answer.
+for image in redis:latest curlimages/curl; do
+  docker pull -q "$image" >/dev/null || docker image inspect "$image" >/dev/null
+done
+
 echo "==> APK"
 KEYSTORE="$HOME/.android/debug.keystore"
 if [ ! -f "$KEYSTORE" ]; then
