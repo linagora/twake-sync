@@ -151,3 +151,45 @@ dependencies {
     implementation(libs.okhttp.base)
     implementation(libs.openid.appauth)
 }
+
+// Translations pulled from l10n still contain the DAVx⁵/ICSx⁵ brand. Each of them must be overridden
+// in src/main/res/values-*/strings_twake.xml, otherwise a new locale or string would show the
+// upstream brand after bumping the l10n submodule.
+val verifyTwakeBranding by tasks.registering {
+    val translationsDir = file("$rootDir/l10n/translations/ose")   // local copies: the check below must
+    val overridesDir = file("src/main/res")                         // not capture the build script
+
+    doLast {
+        val stringRegex = Regex("""<string\s+name="([^"]+)"[^>]*>(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
+        val brandRegex = Regex("DAVx|ICSx")
+        // the download hint points to the real DAVx⁵ app on purpose
+        val ignored = setOf("login_download_button", "login_download_regular_davx5")
+
+        val missing = translationsDir.listFiles { f -> f.isDirectory && f.name.startsWith("values-") }.orEmpty()
+            .sortedBy { it.name }
+            .flatMap { localeDir ->
+                val translations = File(localeDir, "strings.xml").takeIf { it.exists() } ?: return@flatMap emptyList()
+                val overridesFile = File(overridesDir, "${localeDir.name}/strings_twake.xml")
+                val overridden = if (overridesFile.exists())
+                    stringRegex.findAll(overridesFile.readText()).map { it.groupValues[1] }.toSet()
+                else
+                    emptySet()
+
+                stringRegex.findAll(translations.readText())
+                    .filter { brandRegex.containsMatchIn(it.groupValues[2]) }
+                    .map { it.groupValues[1] }
+                    .filter { it !in ignored && it !in overridden }
+                    .map { "${localeDir.name}: $it" }
+                    .toList()
+            }
+
+        require(missing.isEmpty()) {
+            "Translations with the DAVx⁵ brand are not overridden in app-ose/src/main/res/values-*/strings_twake.xml:\n" +
+                    missing.joinToString("\n")
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(verifyTwakeBranding)
+}
