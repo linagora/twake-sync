@@ -369,42 +369,21 @@ private fun FindHelpCard(modifier: Modifier = Modifier) {
             text = AnnotatedString.fromHtml(stringResource(R.string.debug_info_find_help_faq))
         )
         OutlinedButton(
-            onClick = { uriHandler.openUri("https://www.davx5.com/faq") },
+            onClick = { uriHandler.openUri(ExternalUris.Twake.supportUrl.toString()) },
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text(stringResource(R.string.debug_info_find_help_faq_action))
         }
 
         Text(
-            text = AnnotatedString.fromHtml(stringResource(R.string.debug_info_find_help_discussions))
-        )
-        OutlinedButton(
-            onClick = { uriHandler.openUri("https://github.com/bitfireAT/davx5-ose/discussions") },
-            modifier = Modifier.padding(bottom = 8.dp)
-        ) {
-            Icon(Github, stringResource(R.string.debug_info_find_help_discussions_action))
-            Text(stringResource(R.string.debug_info_find_help_discussions_action), Modifier.padding(start = 4.dp))
-        }
-
-        Text(
             text = AnnotatedString.fromHtml(stringResource(R.string.debug_info_find_help_issues))
         )
         OutlinedButton(
-            onClick = { uriHandler.openUri("https://github.com/bitfireAT/davx5-ose/issues") },
-            modifier = Modifier.padding(bottom = 8.dp)
+            onClick = { uriHandler.openUri(ExternalUris.Twake.issuesUrl.toString()) },
+            modifier = Modifier.padding(bottom = 4.dp)
         ) {
             Icon(Github, stringResource(R.string.debug_info_find_help_issues_action))
             Text(stringResource(R.string.debug_info_find_help_issues_action), Modifier.padding(start = 4.dp))
-        }
-
-        Text(
-            text = AnnotatedString.fromHtml(stringResource(R.string.debug_info_find_help_manual))
-        )
-        OutlinedButton(
-            onClick = { uriHandler.openUri("https://manual.davx5.com/") },
-            modifier = Modifier.padding(bottom = 4.dp)
-        ) {
-            Text(stringResource(R.string.debug_info_find_help_manual_action))
         }
     }
 }

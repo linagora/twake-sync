@@ -80,6 +80,20 @@ object ExternalUris {
     }
 
 
+    /**
+     * URLs of Twake Sync support
+     */
+    object Twake {
+
+        val supportUrl
+            get() = "https://twake.app/en/support/".toUri()
+
+        val issuesUrl
+            get() = "https://github.com/linagora/twake-sync/issues".toUri()
+
+    }
+
+
     // helpers
 
     /**
