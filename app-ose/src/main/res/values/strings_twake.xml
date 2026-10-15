@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Twake Sync branding: default values of the translations in values-*/strings_twake.xml (same as in core) -->
-<resources>
+<!-- Twake Sync branding: default values of the translations in values-*/strings_twake.xml (same as in core).
+     Locales without an override keep the translation of core / l10n, so they are not missing. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="account_install_icsx5">Install Twake Sync ICS</string>
     <string name="account_list_welcome">Welcome to Twake Sync!</string>
     <string name="account_title_address_book">Twake Sync Address book</string>
