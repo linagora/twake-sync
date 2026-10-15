@@ -4,4 +4,5 @@
     <string name="account_title_address_book">Twake Sync Address book</string>
     <string name="account_install_icsx5">Install Twake Sync ICS</string>
     <string name="sync_error_permissions">Twake Sync permissions</string>
+    <string name="account_list_welcome">Welcome to Twake Sync!</string>
 </resources>

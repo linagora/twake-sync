@@ -4,4 +4,5 @@
     <string name="account_title_address_book">Twake Sync adresář kontaktů</string>
     <string name="account_install_icsx5">Nainstalovat Twake Sync ICS</string>
     <string name="sync_error_permissions">Twake Sync oprávnění</string>
+    <string name="account_list_welcome">Vítejte v Twake Sync!</string>
 </resources>

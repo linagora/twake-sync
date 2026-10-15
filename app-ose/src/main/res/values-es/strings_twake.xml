@@ -4,4 +4,5 @@
     <string name="account_title_address_book">Agenda Twake Sync</string>
     <string name="account_install_icsx5">Instalar Twake Sync ICS</string>
     <string name="sync_error_permissions">Permisos de Twake Sync</string>
+    <string name="account_list_welcome">¡Bienvenido/a a Twake Sync!</string>
 </resources>
