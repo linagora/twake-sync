@@ -200,6 +200,54 @@ class SyncNotificationManager @AssistedInject constructor(
     }
 
     /**
+     * Informs the user that the change of the contact group method of an address book is waiting because
+     * local changes couldn't be uploaded with the previous method yet.
+     *
+     * Uses its own notification ID and tag, so that it's not dismissed together with the sync errors of the
+     * collection (see [dismissCollectionError]). Dismiss it with [dismissGroupMethodSwitchPostponed].
+     *
+     * @param collectionId      ID of the affected collection, used to derive the notification tag
+     * @param title             title of the notification (usually the affected collection's title)
+     * @param pendingChanges    number of local changes which couldn't be uploaded
+     */
+    suspend fun notifyGroupMethodSwitchPostponed(collectionId: Long, title: String, pendingChanges: Int) {
+        val accountName = accountRepository.getAccountName(accountId)
+        notificationRegistry.notifyIfPossible(
+            NotificationRegistry.NOTIFY_GROUP_METHOD_SWITCH_POSTPONED,
+            tag = buildGroupMethodSwitchTag(collectionId)
+        ) {
+            val message = context.resources.getQuantityString(
+                R.plurals.sync_group_method_switch_postponed, pendingChanges, pendingChanges
+            )
+            val contentIntent = AccountSettingsActivity.createIntent(context, accountId)
+            val builder = NotificationCompat.Builder(context, notificationRegistry.CHANNEL_SYNC_WARNINGS)
+            builder.setSmallIcon(R.drawable.ic_warning_notify)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle(builder).bigText(message))
+                .setSubText(accountName)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(
+                    TaskStackBuilder.create(context)
+                        .addNextIntentWithParentStack(contentIntent)
+                        .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                )
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_ERROR)
+            builder.build()
+        }
+    }
+
+    /**
+     * Dismisses the notification of [notifyGroupMethodSwitchPostponed] (if any).
+     */
+    fun dismissGroupMethodSwitchPostponed(collectionId: Long) =
+        NotificationManagerCompat.from(context)
+            .cancel(buildGroupMethodSwitchTag(collectionId), NotificationRegistry.NOTIFY_GROUP_METHOD_SWITCH_POSTPONED)
+
+    private fun buildGroupMethodSwitchTag(collectionId: Long) = "group-method-switch-$collectionId"
+
+    /**
      * Dismisses the (error) notification for a specific collection.
      *
      * @param collectionId ID of the collection whose notification should be dismissed.
