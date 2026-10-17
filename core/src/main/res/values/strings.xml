@@ -291,8 +291,8 @@
     <string name="login_see_tested_with"><![CDATA[If you\'re unsure what to choose, consult your provider\'s documentation and our <a href="%s">tested services</a> page.]]></string>
     <string name="login_privacy_hint"><![CDATA[All data will only be transferred between your server and your device. %1$s will not send them anywhere else. See <a href=\"%2$s\">privacy policy</a>.]]></string>
     <string name="login_generic_login">Generic login</string>
-    <string name="login_provider_login">Provider-specific login</string>
     <string name="login_continue">Continue</string>
+    <string name="login_other_login_methods">Other login methods</string>
     <string name="login_login">Login</string>
     <string name="login_type_email">Login with email address</string>
     <string name="login_email_address">Email address</string>

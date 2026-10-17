@@ -86,12 +86,40 @@ class LoginScreenViewModel @AssistedInject constructor(
     var finish by mutableStateOf(false)
         private set
 
+    /**
+     * Login type of the login details page from which the login type page has been opened by
+     * [navToLoginTypePage], or `null` if the login type page hasn't been opened that way.
+     */
+    private var loginTypePageOpenedFrom by mutableStateOf<LoginType?>(null)
+
+    /**
+     * Whether the login details page may offer to choose another login type, i.e. to open the
+     * login type page although it has been skipped.
+     */
+    val canChooseOtherLoginType: Boolean
+        get() = page == Page.LoginDetails && skipLoginTypePage && !loginTypesProvider.maybeNonInteractive &&
+                loginTypePageOpenedFrom == null
+
 
     // navigation events
+
+    /**
+     * Continues from the login type page to the login details. Does nothing on other pages, so that
+     * a second tap on "Continue" (before the page has changed) doesn't skip the login details.
+     */
+    fun navFromLoginTypePage() {
+        if (page == Page.LoginType)
+            navToNextPage()
+    }
 
     fun navToNextPage() {
         when (page) {
             Page.LoginType -> {
+                // the login type page has been opened from the login details of the chosen type:
+                // collapse the path, so that the login details behave like the start page again
+                if (loginTypeUiState.loginType == loginTypePageOpenedFrom)
+                    loginTypePageOpenedFrom = null
+
                 // continue to login details
                 loginDetailsUiState = loginDetailsUiState.copy(
                     loginType = loginTypeUiState.loginType
@@ -126,14 +154,35 @@ class LoginScreenViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Opens the login type page from the login details page (when it has been skipped), so that
+     * another login type can be chosen. Back from the login type page then returns to the login
+     * details page it has been opened from.
+     */
+    fun navToLoginTypePage() {
+        if (!canChooseOtherLoginType)
+            return
+        loginTypePageOpenedFrom = loginDetailsUiState.loginType
+        page = Page.LoginType
+    }
+
     fun navBack() {
         when (page) {
-            Page.LoginType ->
-                finish = true
+            Page.LoginType -> {
+                val openedFrom = loginTypePageOpenedFrom
+                if (openedFrom != null) {
+                    // return to the login details page the login type page has been opened from
+                    loginTypePageOpenedFrom = null
+                    selectLoginType(openedFrom)
+                    page = Page.LoginDetails
+                } else
+                    finish = true
+            }
 
             Page.LoginDetails ->
-                // don't show the login type page when it has been skipped (not part of the Twake Sync flow)
-                if (skipLoginTypePage || loginTypesProvider.maybeNonInteractive)
+                // don't show the login type page when it has been skipped (not part of the Twake Sync flow),
+                // unless the user has opened it explicitly
+                if (loginTypePageOpenedFrom == null && (skipLoginTypePage || loginTypesProvider.maybeNonInteractive))
                     finish = true
                 else
                     page = Page.LoginType
