@@ -27,6 +27,13 @@ class StandardLoginTypesProvider @Inject constructor(
             GoogleLogin,
             NextcloudLogin
         )
+
+        /**
+         * Login types offered on the login type page. Provider-specific login types (OAuth with the
+         * upstream client IDs) are not part of Twake Sync.
+         */
+        val selectableLoginTypes: List<LoginType>
+            get() = genericLoginTypes
     }
 
     override val defaultLoginType = UrlLogin
