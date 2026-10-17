@@ -26,7 +26,7 @@ fun LoginTypePage(
             model.updateLoginInfo(loginInfo)
         },
         onContinue = {
-            model.navToNextPage()
+            model.navFromLoginTypePage()
         }
     )
 }
