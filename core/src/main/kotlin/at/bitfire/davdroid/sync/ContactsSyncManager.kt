@@ -237,15 +237,16 @@ class ContactsSyncManager @AssistedInject constructor(
         // map to Contact
         val newData = ContactReader.fromVCard(vCard, downloader)
 
-        if (!groupStrategy.verifyContactBeforeSaving(newData)) {
+        if (groupStrategy.consumeReceivedContact(newData)) {
             // vCard shall not be saved (e.g. group vCard with group method CATEGORIES);
             // remove a local entry that may have been created from it before (e.g. a fake contact)
             localCollection.findByName(fileName)?.let { existing ->
-                logger.info("Removing local entry of ignored vCard $fileName: $existing")
+                logger.info("Removing local entry of vCard $fileName that is not saved locally: $existing")
                 existing.deleteLocal()
             }
             return
         }
+        groupStrategy.verifyContactBeforeSaving(newData)
 
         var updated: LocalAddress? = null
 

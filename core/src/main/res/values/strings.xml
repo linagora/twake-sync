@@ -433,6 +433,10 @@
         <item>Groups are separate vCards</item>
         <item>Groups are per-contact categories</item>
     </string-array>
+    <string name="settings_contact_group_method_change_title">Change contact group method?</string>
+    <string name="settings_contact_group_method_change_to_categories">Local changes are uploaded first; the change completes once they have been uploaded. Then the address books are synchronized again from the server. The members of each group get the group name as category, and those contacts are updated on the server. Group vCards stay on the server for other apps. Empty groups can\'t be stored as categories and are removed from this device.</string>
+    <string name="settings_contact_group_method_change_to_group_vcards">The address books are synchronized again from the server. Local changes which haven\'t been uploaded yet are lost.</string>
+    <string name="settings_contact_group_method_change_confirm">Change</string>
 
     <!-- CreateAddressBookScreen, CreateCalendarScreen -->
     <string name="create_addressbook">Create address book</string>
@@ -583,6 +587,10 @@
     <string name="sync_error_authentication_failed">Authentication failed (check login credentials)</string>
     <string name="sync_error_io">Network or I/O error – %s</string>
     <string name="sync_error_http_dav">HTTP server error – %s</string>
+    <plurals name="sync_group_method_switch_postponed">
+        <item quantity="one">Contact groups not converted yet: %d local change couldn\'t be uploaded. Fix or remove it, or switch the group method back.</item>
+        <item quantity="other">Contact groups not converted yet: %d local changes couldn\'t be uploaded. Fix or remove them, or switch the group method back.</item>
+    </plurals>
     <string name="sync_error_local_storage">Local storage error – %s</string>
     <string name="sync_error_retry_limit_reached">Soft error (max retries reached)</string>
     <string name="sync_invalid_contact">Received invalid contact from server</string>
