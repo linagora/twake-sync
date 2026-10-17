@@ -18,6 +18,7 @@ import androidx.core.content.contentValuesOf
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import at.bitfire.davdroid.accounts.LegacyAccount
+import at.bitfire.davdroid.sync.groups.ReceivedGroupVCard
 import at.bitfire.synctools.mapping.contacts.Contact
 import at.bitfire.synctools.mapping.contacts.LabeledProperty
 import at.bitfire.synctools.mapping.contacts.PendingMemberships
@@ -30,6 +31,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import ezvcard.property.Telephone
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.Assert.assertEquals
@@ -261,7 +263,131 @@ class LocalAddressBookTest {
     }
 
 
+    @Test
+    fun testApplyGroupVCardsAsCategories_mergesWithDownloadedCategories() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            // Carol as just downloaded from the server: CATEGORIES:Work
+            val carol = addressBook.addContact(
+                Contact(uid = "carol", displayName = "Carol Seed").apply { categories += "Work" },
+                "carol.vcf", "\"carol-etag\"", 0
+            )
+            val carolId = carol.id!!
+            assertFalse(isContactDirty(addressBook, carolId))
+
+            val changed = addressBook.applyGroupVCardsAsCategories(listOf(
+                ReceivedGroupVCard("QA Group", setOf("carol", "not-in-address-book")),
+                ReceivedGroupVCard("Empty Group", emptySet())
+            ))
+
+            assertEquals(1, changed)
+            // merged: the category from the server is kept, the group is added
+            assertEquals(
+                setOf("Work", "QA Group"),
+                addressBook.findContactById(carolId).androidContact.getContact().categories.toSet()
+            )
+            // uploaded with the next sync, with the ETag that has been downloaded
+            assertTrue(isContactDirty(addressBook, carolId))
+            assertEquals("\"carol-etag\"", addressBook.findContactById(carolId).eTag)
+            // empty groups can't be represented as categories
+            assertEquals(setOf("Work", "QA Group"), groupTitles(addressBook))
+        }
+    }
+
+    @Test
+    fun testApplyGroupVCardsAsCategories_categoryAlreadyPresent() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            val carol = addressBook.addContact(
+                Contact(uid = "carol", displayName = "Carol Seed").apply { categories += "QA Group" },
+                "carol.vcf", "\"carol-etag\"", 0
+            )
+
+            val changed = addressBook.applyGroupVCardsAsCategories(listOf(ReceivedGroupVCard("QA Group", setOf("carol"))))
+
+            assertEquals(0, changed)
+            assertFalse(isContactDirty(addressBook, carol.id!!))
+            assertEquals(listOf("QA Group"), addressBook.findContactById(carol.id!!).androidContact.getContact().categories)
+        }
+    }
+
+    @Test
+    fun testApplyGroupVCardsAsCategories_readOnly_appliesLocallyWithoutDirty() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            val carol = addressBook.addContact(
+                Contact(uid = "carol", displayName = "Carol Seed").apply { categories += "Work" },
+                "carol.vcf", "\"carol-etag\"", 0
+            )
+            addressBook.readOnly = true
+
+            val changed = addressBook.applyGroupVCardsAsCategories(listOf(ReceivedGroupVCard("QA Group", setOf("carol"))))
+
+            assertEquals(1, changed)
+            assertEquals(
+                setOf("Work", "QA Group"),
+                addressBook.findContactById(carol.id!!).androidContact.getContact().categories.toSet()
+            )
+            // can't be uploaded
+            assertFalse(isContactDirty(addressBook, carol.id!!))
+        }
+    }
+
+    @Test
+    fun testApplyGroupVCardsAsCategories_caseInsensitive_reusesExistingGroup() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            // as downloaded: Carol has "friends" and "Work", Dave has no category
+            val carol = addressBook.addContact(
+                Contact(uid = "carol", displayName = "Carol Seed").apply { categories += listOf("friends", "Work") },
+                "carol.vcf", "\"carol\"", 0
+            )
+            val dave = addressBook.addContact(Contact(uid = "dave", displayName = "Dave"), "dave.vcf", "\"dave\"", 0)
+
+            // Carol in two groups whose titles differ in case from her categories
+            val changed = addressBook.applyGroupVCardsAsCategories(listOf(
+                ReceivedGroupVCard("Friends", setOf("carol", "dave")),
+                ReceivedGroupVCard("WORK", setOf("carol"))
+            ))
+
+            assertEquals(1, changed)
+            assertFalse(isContactDirty(addressBook, carol.id!!))
+            assertTrue(isContactDirty(addressBook, dave.id!!))
+            // Dave joins the existing group "friends"; no group "Friends" / "WORK" is created
+            assertEquals(listOf("friends"), addressBook.findContactById(dave.id!!).androidContact.getContact().categories)
+            assertEquals(setOf("friends", "Work"), groupTitles(addressBook))
+        }
+    }
+
+    @Test
+    fun testApplyGroupVCardsAsCategories_titleWithCommaAndSemicolon() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            val carol = addressBook.addContact(Contact(uid = "carol", displayName = "Carol Seed"), "carol.vcf", "\"carol\"", 0)
+
+            addressBook.applyGroupVCardsAsCategories(listOf(ReceivedGroupVCard("Smith, Jones; Co", setOf("carol"))))
+
+            assertEquals(
+                listOf("Smith, Jones; Co"),
+                addressBook.findContactById(carol.id!!).androidContact.getContact().categories
+            )
+        }
+    }
+
+    @Test
+    fun testGroupVCardsConversionPending() = runTest {
+        localTestAddressBook.provide(accountId, provider, GroupMethod.CATEGORIES) { addressBook ->
+            assertFalse(addressBook.isGroupVCardsConversionPending())
+            addressBook.setGroupVCardsConversionPending(true)
+            assertTrue(addressBook.isGroupVCardsConversionPending())
+            addressBook.setGroupVCardsConversionPending(false)
+            assertFalse(addressBook.isGroupVCardsConversionPending())
+        }
+    }
+
+
     // helpers
+
+    private suspend fun groupTitles(addressBook: LocalAddressBook): Set<String> =
+        addressBook.ab.queryGroupRows(arrayOf(Groups.TITLE), null, null)
+            .toList()
+            .mapNotNull { it.getAsString(Groups.TITLE) }
+            .toSet()
 
     private fun newGroup(addressBook: LocalAddressBook): LocalGroup =
         addressBook.addGroup(Contact().apply { displayName = "Test Group" }, null, null, 0)

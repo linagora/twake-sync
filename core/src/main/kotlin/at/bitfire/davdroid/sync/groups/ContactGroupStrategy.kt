@@ -21,12 +21,17 @@ interface ContactGroupStrategy {
     suspend fun beforeUploadDirty() {}
 
     /**
-     * Verifies/adapts a received vCard before it's saved to the local address book.
+     * Gives the strategy the chance to take over a received vCard instead of having it saved to the
+     * local address book (for instance, a group vCard when groups are represented as categories).
      *
-     * @return whether the vCard shall be saved locally (`false`: ignore it)
+     * Called before [verifyContactBeforeSaving]. When it returns `true`, the vCard is not saved, and a
+     * local entry which may have been created from it earlier is removed.
+     *
+     * @return whether the strategy has taken over the vCard (`false`: save it as usual)
      */
-    fun verifyContactBeforeSaving(contact: Contact): Boolean
+    fun consumeReceivedContact(contact: Contact): Boolean = false
 
+    fun verifyContactBeforeSaving(contact: Contact)
     suspend fun postProcess()
 
 }

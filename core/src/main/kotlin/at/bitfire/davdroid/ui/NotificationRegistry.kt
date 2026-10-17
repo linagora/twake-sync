@@ -51,6 +51,8 @@ class NotificationRegistry @Inject constructor(
         const val NOTIFY_TASKS_PROVIDER_TOO_OLD = 20
         const val NOTIFY_PERMISSIONS = 21
         const val NOTIFY_SELECT_PUSH_DISTRIBUTOR = 22
+        /** switch of the contact group method postponed because local changes couldn't be uploaded (tag per collection) */
+        const val NOTIFY_GROUP_METHOD_SWITCH_POSTPONED = 30
 
         /**
          * Used in build variants when a [at.bitfire.davdroid.sync.SyncValidator]
