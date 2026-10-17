@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -62,7 +63,8 @@ object EmailLogin : LoginType {
             onSetEmail = model::setEmail,
             password = uiState.password,
             canContinue = uiState.canContinue,
-            onLogin = { onLogin(uiState.asLoginInfo()) }
+            onLogin = { onLogin(uiState.asLoginInfo()) },
+            onChooseOtherLoginType = LocalOnChooseOtherLoginType.current
         )
     }
 
@@ -75,7 +77,8 @@ fun EmailLoginScreen(
     onSetEmail: (String) -> Unit = {},
     password: TextFieldState,
     canContinue: Boolean,
-    onLogin: () -> Unit = {}
+    onLogin: () -> Unit = {},
+    onChooseOtherLoginType: (() -> Unit)? = null
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -132,6 +135,14 @@ fun EmailLoginScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (onChooseOtherLoginType != null)
+                TextButton(
+                    onClick = onChooseOtherLoginType,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text(stringResource(R.string.login_other_login_methods))
+                }
         }
     }
 
@@ -147,6 +158,7 @@ fun EmailLoginScreen_Preview() {
     EmailLoginScreen(
         email = "test@example.com",
         password = rememberTextFieldState(""),
-        canContinue = false
+        canContinue = false,
+        onChooseOtherLoginType = {}
     )
 }

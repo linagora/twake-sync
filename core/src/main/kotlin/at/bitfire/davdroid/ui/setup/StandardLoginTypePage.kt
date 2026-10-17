@@ -50,19 +50,7 @@ fun StandardLoginTypePage(
 
             LoginDetailsHelpCard(screenName = "StandardLoginTypePage")
 
-            for (type in StandardLoginTypesProvider.genericLoginTypes)
-                LoginTypeSelector(
-                    title = stringResource(type.title),
-                    selected = type == selectedLoginType,
-                    onSelect = { onSelectLoginType(type) }
-                )
-
-            Text(
-                stringResource(R.string.login_provider_login),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-            )
-            for (type in StandardLoginTypesProvider.specificLoginTypes)
+            for (type in StandardLoginTypesProvider.selectableLoginTypes)
                 LoginTypeSelector(
                     title = stringResource(type.title),
                     selected = type == selectedLoginType,
