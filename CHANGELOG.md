@@ -3,6 +3,13 @@
 Twake Sync is based on [DAVx⁵ OSE](https://github.com/bitfireAT/davx5-ose). This file lists only
 Twake Sync specific changes; see the upstream project for DAVx⁵ changes.
 
+## 2026.10.19.02
+
+First release uploaded to Google Play by CI (internal track). It ships the app changes of 2026.10.19.01:
+- Keep group memberships when switching group vCards to categories
+- Login: the URL and Advanced login options can be reached from the email login page
+- Hide the "Keep Android Open" banner on the accounts screen
+
 ## 2026.10.19.01
 
 ### Fixed

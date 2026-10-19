@@ -24,7 +24,7 @@ android {
         applicationId = "com.twake.android.sync"
 
         // versionCode is defined in the build-logic submodule (AppVersion); Twake Sync uses date-based version names
-        versionName = "2026.10.19.01"
+        versionName = "2026.10.19.02"
 
         base.archivesName = "twake-sync-$versionCode-$versionName"
 
