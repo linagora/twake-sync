@@ -81,6 +81,22 @@ jobs:
           ' CHANGELOG.md >"$RUNNER_TEMP/release-notes.md"
           cat "$RUNNER_TEMP/release-notes.md"
 
+          # Google Play "What's new": plain text, at most 500 characters
+          mkdir -p "$RUNNER_TEMP/whatsnew"
+          grep '^- ' "$RUNNER_TEMP/release-notes.md" | sed 's/`//g' | head -c 500 >"$RUNNER_TEMP/whatsnew/whatsnew-en-US"
+
+      - name: Upload to Google Play (internal track)
+        uses: r0adkll/upload-google-play@v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: com.twake.android.sync
+          releaseFiles: app-ose/build/outputs/bundle/oseRelease/*.aab
+          releaseName: ${{ github.ref_name }}
+          track: internal
+          status: completed
+          mappingFile: app-ose/build/outputs/mapping/oseRelease/mapping.txt
+          whatsNewDirectory: ${{ runner.temp }}/whatsnew
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
         with:
