@@ -1,0 +1,93 @@
+name: Twake Sync release
+on:
+  push:
+    tags:
+      # same format as versionName in app-ose/build.gradle.kts, e.g. 2026.10.19.01
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9]'
+
+concurrency:
+  group: twake-release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  java-version: 21   # keep in sync with gradle/gradle-daemon-jvm.properties
+
+jobs:
+  authorize:
+    name: Check admin permission
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require admin permission of the triggering user
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACTOR: ${{ github.triggering_actor }}
+        run: |
+          permission=$(gh api "repos/${{ github.repository }}/collaborators/$ACTOR/permission" --jq .permission)
+          echo "$ACTOR has permission: $permission"
+          if [ "$permission" != "admin" ]; then
+            echo "::error::Only repository admins can build a Twake Sync release ($ACTOR is $permission)"
+            exit 1
+          fi
+
+  build:
+    name: Build signed release
+    needs: authorize
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive   # translations live in the l10n submodule
+
+      - name: Check tag matches versionName
+        run: |
+          version_name=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app-ose/build.gradle.kts)
+          if [ "$version_name" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match versionName $version_name in app-ose/build.gradle.kts"
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ env.java-version }}
+      - uses: gradle/actions/setup-gradle@v6.3.0
+
+      - name: Prepare keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d >"$RUNNER_TEMP/keystore.jks"
+
+      - name: Build signed AAB and APK
+        # don't use build cache to guarantee deterministic, fresh builds
+        run: ./gradlew --no-build-cache app-ose:clean app-ose:bundleOseRelease app-ose:assembleOseRelease
+        env:
+          ANDROID_KEYSTORE: ${{ runner.temp }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/keystore.jks"
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          awk -v version="## $GITHUB_REF_NAME" '
+            $0 == version { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md >"$RUNNER_TEMP/release-notes.md"
+          cat "$RUNNER_TEMP/release-notes.md"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Twake Sync ${{ github.ref_name }}
+          body_path: ${{ runner.temp }}/release-notes.md
+          files: |
+            app-ose/build/outputs/bundle/oseRelease/*.aab
+            app-ose/build/outputs/apk/ose/release/*.apk
+            app-ose/build/outputs/mapping/oseRelease/mapping.txt
+          fail_on_unmatched_files: true
