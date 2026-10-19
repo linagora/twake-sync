@@ -14,6 +14,8 @@ concurrency:
 jobs:
   mirror-english-strings:
     name: Mirror English strings to davx5-translations
+    # only upstream has the davx5-translations repository and the app secrets for it
+    if: github.repository == 'bitfireAT/davx5-ose'
     permissions:
       contents: read
     runs-on: ubuntu-latest
