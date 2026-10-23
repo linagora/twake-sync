@@ -197,6 +197,9 @@ dependencies {
     androidTestImplementation(testFixtures(project(":synctools")))
 
     testImplementation(libs.bitfire.dav4jvm)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.ktor.client.mock)

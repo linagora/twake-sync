@@ -16,7 +16,9 @@ import at.bitfire.davdroid.log.DebugDirectory
 import at.bitfire.davdroid.log.FileLoggerFactory
 import at.bitfire.davdroid.network.HttpClientBuilder
 import at.bitfire.davdroid.repository.AccountRepository
+import at.bitfire.davdroid.servicedetection.DavDiscoveryHosts
 import at.bitfire.davdroid.servicedetection.DavResourceFinder
+import at.bitfire.davdroid.servicedetection.TwakeSyncWellKnown
 import at.bitfire.davdroid.settings.AccountSettings
 import at.bitfire.davdroid.settings.SettingsManager
 import at.bitfire.davdroid.util.DavUtils.toUrlOrNull
@@ -242,6 +244,7 @@ class LoginScreenViewModel @AssistedInject constructor(
         val loading: Boolean = false,
         val foundNothing: Boolean = false,
         val encountered401: Boolean = false,
+        val appAccountsUrl: String? = null,
         val loginValidationFailed: Boolean = false,
         val debugLogFileName: DebugDirectory.FileName? = null
     )
@@ -254,7 +257,7 @@ class LoginScreenViewModel @AssistedInject constructor(
 
     private fun detectResources() {
         val baseUri = loginInfo.baseUri ?: return
-        detectResourcesUiState = detectResourcesUiState.copy(loading = true)
+        detectResourcesUiState = detectResourcesUiState.copy(loading = true, appAccountsUrl = null)
         detectResourcesJob = viewModelScope.launch {
             if (!validateLogin(baseUri)) {
                 detectResourcesUiState = detectResourcesUiState.copy(loading = false, loginValidationFailed = true)
@@ -272,6 +275,7 @@ class LoginScreenViewModel @AssistedInject constructor(
                         loading = false,
                         foundNothing = true,
                         encountered401 = result.encountered401,
+                        appAccountsUrl = result.appAccountsUrl?.toString(),
                         debugLogFileName = logFile
                     )
                 }
@@ -307,8 +311,9 @@ class LoginScreenViewModel @AssistedInject constructor(
 
         val result = FileLoggerFactory.forFile(logFile).use { fileLoggerContext ->
             val credentials = loginInfo.credentials
+            val logger = fileLoggerContext.logger
             httpClientBuilder
-                .logTo(fileLoggerContext.logger)    // log HTTP calls to logFile
+                .logTo(logger)
                 .let { builder ->
                     if (credentials != null)
                         builder.authenticate(domain = null, getCredentials = { credentials })
@@ -321,11 +326,18 @@ class LoginScreenViewModel @AssistedInject constructor(
                         baseUri,
                         credentials,
                         httpClient,
-                        log = fileLoggerContext.logger  // log resource detection to logFile
+                        log = logger
                     )
-
-                    // run the actual service detection
-                    finder.findInitialConfiguration()
+                    val detected = finder.findInitialConfiguration()
+                    val appAccountsUrl = if (detected.shouldFetchTwakeWellKnown())
+                        DavDiscoveryHosts.emailDomain(baseUri)?.let { domain ->
+                            httpClientBuilder.logTo(logger).build().use { unauthenticated ->
+                                TwakeSyncWellKnown.fetch(unauthenticated, domain)
+                            }
+                        }
+                    else
+                        null
+                    detected.copy(appAccountsUrl = appAccountsUrl)
                 }
         }
         return result to SERVICE_DETECTION_LOG_FILE
