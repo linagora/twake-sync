@@ -346,6 +346,9 @@
     <string name="login_no_service_info">There\'s no CalDAV or CardDAV service at the base URL you entered, and automatic detection didn\'t find one either. Usually this means that the base URL is wrong.</string>
     <string name="login_see_tested_services"><![CDATA[The correct base URL is usually documented by your service provider. You can also look it up in <a href="%s">our list of tested services</a>.]]></string>
     <string name="login_check_credentials"><![CDATA[The server rejected the login. Please double-check your username and password. Some providers require an <a href="%s">app password</a> instead of your regular password.]]></string>
+    <string name="login_use_applicative_account">Please use an applicative account</string>
+    <string name="login_use_applicative_account_info">Your main password can\'t be used for sync. Create an application account, then enter its credentials here.</string>
+    <string name="login_manage_application_accounts">Manage application accounts</string>
     <string name="login_logs_available">Further technical information is available in the logs.</string>
     <string name="login_view_logs">View logs</string>
     <string name="login_invalid_use_case">Invalid use-case</string>

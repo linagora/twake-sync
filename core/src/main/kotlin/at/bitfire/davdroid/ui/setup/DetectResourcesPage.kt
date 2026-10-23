@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
@@ -54,6 +55,7 @@ fun DetectResourcesPage(
         loading = uiState.loading,
         foundNothing = uiState.foundNothing,
         encountered401 = uiState.encountered401,
+        appAccountsUrl = uiState.appAccountsUrl,
         loginValidationFailed = uiState.loginValidationFailed,
         debugLogFileName = uiState.debugLogFileName
     )
@@ -64,6 +66,7 @@ fun DetectResourcesPageContent(
     loading: Boolean,
     foundNothing: Boolean,
     encountered401: Boolean,
+    appAccountsUrl: String? = null,
     loginValidationFailed: Boolean,
     debugLogFileName: DebugDirectory.FileName?
 ) {
@@ -78,6 +81,7 @@ fun DetectResourcesPageContent(
         else if (foundNothing)
             DetectResourcesPageContent_NothingFound(
                 encountered401 = encountered401,
+                appAccountsUrl = appAccountsUrl,
                 debugLogFileName = debugLogFileName
             )
     }
@@ -110,9 +114,12 @@ fun DetectResourcesPageContent_InProgress() {
 @Composable
 fun DetectResourcesPageContent_NothingFound(
     encountered401: Boolean,
+    appAccountsUrl: String? = null,
     debugLogFileName: DebugDirectory.FileName?
 ) {
     val context = LocalContext.current
+
+    val showAppAccounts = appAccountsUrl != null
 
     Column(Modifier.padding(8.dp)) {
         Text(
@@ -125,6 +132,7 @@ fun DetectResourcesPageContent_NothingFound(
             Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
+                .testTag("login_no_service")
         ) {
             Column(Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -144,11 +152,35 @@ fun DetectResourcesPageContent_NothingFound(
             }
         }
 
-        // most likely cause when the server answered with 401, so show it first
-        if (encountered401)
+        if (showAppAccounts)
+            ActionCard(
+                icon = Icons.Default.Key,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .testTag("manage_application_accounts"),
+                actionText = stringResource(R.string.login_manage_application_accounts),
+                onAction = {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, appAccountsUrl.toUri()))
+                }
+            ) {
+                Column {
+                    Text(
+                        stringResource(R.string.login_use_applicative_account),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        stringResource(R.string.login_use_applicative_account_info),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        else if (encountered401)
             IconCard(
                 icon = Icons.Default.Key,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .testTag("login_generic_credentials")
             ) {
                 Text(
                     AnnotatedString.fromHtml(
@@ -167,7 +199,9 @@ fun DetectResourcesPageContent_NothingFound(
             .build()
         IconCard(
             icon = Icons.Default.Info,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .testTag("login_tested_services")
         ) {
             Text(
                 AnnotatedString.fromHtml(
@@ -183,6 +217,7 @@ fun DetectResourcesPageContent_NothingFound(
         if (debugLogFileName != null)
             ActionCard(
                 icon = Icons.Default.BugReport,
+                modifier = Modifier.testTag("login_view_logs"),
                 actionText = stringResource(R.string.login_view_logs),
                 onAction = {
                     val intent = DebugInfoActivity.IntentBuilder(context)
@@ -272,6 +307,26 @@ fun DetectResourcesPage_NothingFound_401() {
 fun DetectResourcesPage_NothingFound_401_WithLogs() {
     DetectResourcesPageContent_NothingFound(
         encountered401 = true,
+        debugLogFileName = DebugDirectory.FileName("davdroid-detection.log")
+    )
+}
+
+@Composable
+@Preview
+fun DetectResourcesPage_NothingFound_401_AppAccounts() {
+    DetectResourcesPageContent_NothingFound(
+        encountered401 = true,
+        appAccountsUrl = "https://sso.twake.app/deviceaccounts",
+        debugLogFileName = DebugDirectory.FileName("davdroid-detection.log")
+    )
+}
+
+@Composable
+@Preview
+fun DetectResourcesPage_NothingFound_UnreachableHost_AppAccounts() {
+    DetectResourcesPageContent_NothingFound(
+        encountered401 = false,
+        appAccountsUrl = "https://sso.twake.app/deviceaccounts",
         debugLogFileName = DebugDirectory.FileName("davdroid-detection.log")
     )
 }
