@@ -32,6 +32,7 @@ import io.ktor.http.URLBuilder
 import io.ktor.http.URLProtocol
 import io.ktor.http.Url
 import io.ktor.http.encodedPath
+import kotlinx.coroutines.CancellationException
 import org.xbill.DNS.Type
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
@@ -75,6 +76,8 @@ class DavResourceFinder @AssistedInject constructor(
     }
 
     private var encountered401 = false
+    private var encounteredUnreachableHost = false
+    private var encountered401OnTwakeDav = false
 
 
     /**
@@ -113,7 +116,9 @@ class DavResourceFinder @AssistedInject constructor(
         return Configuration(
             cardDAV = cardDavConfig,
             calDAV = calDavConfig,
-            encountered401 = encountered401
+            encountered401 = encountered401,
+            encounteredUnreachableHost = encounteredUnreachableHost,
+            encountered401OnTwakeDav = encountered401OnTwakeDav
         )
     }
 
@@ -360,6 +365,9 @@ class DavResourceFinder @AssistedInject constructor(
      * Try to find the principal URL by performing service discovery on a given domain name.
      * Only secure services (caldavs, carddavs) will be discovered!
      *
+     * Email-only (`mailto:`) login also tries `https://dav.<domain>` after RFC 6764 on [domain]
+     * finds no principal, unless that host was already used.
+     *
      * @param domain         domain name, e.g. "icloud.com"
      * @param service        service to discover (CALDAV or CARDDAV)
      * @return principal URL, or null if none found
@@ -398,24 +406,36 @@ class DavResourceFinder @AssistedInject constructor(
             add("/")
         }
 
-        for (path in paths)
-            try {
-                val initialContextPath = URLBuilder(
-                    protocol = URLProtocol.HTTPS,
-                    host = fqdn,
-                    port = port
-                ).apply {
-                    encodedPath = path
-                }.build()
+        val emailLogin = DavDiscoveryHosts.isEmailLogin(baseURI)
+        val hosts = buildList {
+            add(fqdn to port)
+            DavDiscoveryHosts.fallbackHost(domain, fqdn, emailLogin)?.let { add(it to 443) }
+            DavDiscoveryHosts.twakeDavHost(map { it.first }, emailLogin)?.let { add(it to 443) }
+        }
 
-                log.info("Trying to determine principal from initial context path=$initialContextPath")
-                val principal = getCurrentUserPrincipal(initialContextPath, service)
+        for ((host, hostPort) in hosts)
+            for (path in paths)
+                try {
+                    val initialContextPath = URLBuilder(
+                        protocol = URLProtocol.HTTPS,
+                        host = host,
+                        port = hostPort
+                    ).apply {
+                        encodedPath = path
+                    }.build()
 
-                principal?.let { return it }
-            } catch (e: Exception) {
-                log.log(Level.WARNING, "No resource found", e)
-                processException(e)
-            }
+                    log.info("Trying to determine principal from initial context path=$initialContextPath")
+                    val principal = getCurrentUserPrincipal(initialContextPath, service)
+
+                    principal?.let { return it }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    log.log(Level.WARNING, "No resource found", e)
+                    processException(e, host)
+                    if (DavDiscoveryHosts.isUnreachableHostError(e))
+                        break
+                }
         return null
     }
 
@@ -449,11 +469,19 @@ class DavResourceFinder @AssistedInject constructor(
      * Processes a thrown exception like this:
      *
      *   - If the Exception is an [UnauthorizedException] (HTTP 401), [encountered401] is set to *true*.
+     *     When [host] is [DavDiscoveryHosts.TWAKE_DAV_HOST], [encountered401OnTwakeDav] is also set.
+     *   - If the host cannot be resolved or connected, [encounteredUnreachableHost] is set to *true*.
      *   - Re-throws the exception if it signals that the current thread was interrupted to stop the current operation.
      */
-    private fun processException(e: Exception) {
-        if (e is UnauthorizedException)
+    private fun processException(e: Exception, host: String? = null) {
+        if (e is CancellationException)
+            throw e
+        if (e is UnauthorizedException) {
             encountered401 = true
+            if (host.equals(DavDiscoveryHosts.TWAKE_DAV_HOST, ignoreCase = true))
+                encountered401OnTwakeDav = true
+        } else if (DavDiscoveryHosts.isUnreachableHostError(e))
+            encounteredUnreachableHost = true
         else if ((e is InterruptedIOException && e !is SocketTimeoutException) || e is InterruptedException)
             throw e
     }
@@ -465,8 +493,14 @@ class DavResourceFinder @AssistedInject constructor(
         val cardDAV: ServiceInfo?,
         val calDAV: ServiceInfo?,
 
-        val encountered401: Boolean
+        val encountered401: Boolean,
+        val encounteredUnreachableHost: Boolean = false,
+        val encountered401OnTwakeDav: Boolean = false,
+        val appAccountsUrl: Url? = null
     ) {
+
+        fun shouldFetchTwakeWellKnown(): Boolean =
+            cardDAV == null && calDAV == null && encountered401OnTwakeDav
 
         data class ServiceInfo(
             var principal: Url? = null,
