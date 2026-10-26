@@ -3,6 +3,13 @@
 Twake Sync is based on [DAVx⁵ OSE](https://github.com/bitfireAT/davx5-ose). This file lists only
 Twake Sync specific changes; see the upstream project for DAVx⁵ changes.
 
+## 2026.10.26.01
+
+### Changed
+- Login: discover CalDAV/CardDAV on `dav.<email domain>`, then fall back to `dav.twake.app`
+- Login: fetch the well-known configuration after `dav.twake.app` answers 401
+- Login: show the applicative account card when the well-known configuration has a URL
+
 ## 2026.10.19.02
 
 First release uploaded to Google Play by CI (internal track). It ships the app changes of 2026.10.19.01:
