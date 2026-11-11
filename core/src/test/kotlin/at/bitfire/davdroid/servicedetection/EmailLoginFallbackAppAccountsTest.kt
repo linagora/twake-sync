@@ -26,6 +26,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.ConscryptMode
 import org.xbill.DNS.DClass
+import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Name
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
@@ -450,6 +451,69 @@ class EmailLoginFallbackAppAccountsTest {
     }
 
     @Test
+    fun emailLogin_customDomainWithoutTwakeMx_neverContactsTwakeDav() = runTest {
+        val requested = mutableListOf<String>()
+        val engine = MockEngine { request ->
+            requested += "${request.method.value} ${request.url.host}${request.url.encodedPath}"
+            when {
+                request.method == HttpMethod.Get && request.url.encodedPath == TwakeSyncWellKnown.PATH ->
+                    respond(
+                        """{"app_accounts_url":"$APP_ACCOUNTS"}""",
+                        HttpStatusCode.OK,
+                        jsonHeaders
+                    )
+                request.method.value == "PROPFIND" ->
+                    respond("", HttpStatusCode.Unauthorized, unauthorizedHeaders)
+                else -> respond("", HttpStatusCode.NotFound)
+            }
+        }
+
+        val config = detectEmailLogin(
+            engine,
+            dns = dnsResolver(mxTargets = listOf("mx.example.com.")),
+            emailDomain = CUSTOM_EMAIL_DOMAIN
+        )
+
+        assertNull(config.appAccountsUrl)
+        assertTrue(config.encountered401)
+        assertFalse(config.encountered401OnTwakeDav)
+        assertTrue(requested.none { it.contains(FALLBACK_HOST) })
+        assertTrue(requested.any { it.startsWith("PROPFIND $CUSTOM_EMAIL_DOMAIN") })
+        assertTrue(requested.any { it.startsWith("PROPFIND $CUSTOM_FALLBACK_HOST") })
+    }
+
+    @Test
+    fun emailLogin_customDomainBackupTwakeMx_triesTwakeDav() = runTest {
+        val requested = mutableListOf<String>()
+        val engine = MockEngine { request ->
+            requested += "${request.method.value} ${request.url.host}${request.url.encodedPath}"
+            when {
+                request.method == HttpMethod.Get &&
+                    request.url.host == FALLBACK_HOST &&
+                    request.url.encodedPath == TwakeSyncWellKnown.PATH ->
+                    respond(
+                        """{"app_accounts_url":"$APP_ACCOUNTS"}""",
+                        HttpStatusCode.OK,
+                        jsonHeaders
+                    )
+                request.method.value == "PROPFIND" && request.url.host == FALLBACK_HOST ->
+                    respond("", HttpStatusCode.Unauthorized, unauthorizedHeaders)
+                else -> respond("", HttpStatusCode.NotFound)
+            }
+        }
+
+        val config = detectEmailLogin(
+            engine,
+            dns = dnsResolver(mxTargets = listOf("mx0.mail.ovh.net.", "smtp.twake.app.")),
+            emailDomain = CUSTOM_EMAIL_DOMAIN
+        )
+
+        assertEquals(Url(APP_ACCOUNTS), config.appAccountsUrl)
+        assertTrue(config.encountered401OnTwakeDav)
+        assertTrue(requested.any { it.startsWith("PROPFIND $FALLBACK_HOST") })
+    }
+
+    @Test
     fun httpsLogin_401_skipsWellKnownEvenWhenJsonIsServed() = runTest {
         val requested = mutableListOf<String>()
         val engine = MockEngine { request ->
@@ -546,10 +610,17 @@ class EmailLoginFallbackAppAccountsTest {
         }
     }
 
-    private fun dnsResolver(srv: Array<org.xbill.DNS.Record> = emptyArray()): DnsRecordResolver {
+    private fun dnsResolver(
+        srv: Array<org.xbill.DNS.Record> = emptyArray(),
+        mxTargets: List<String> = listOf("smtp.twake.app.")
+    ): DnsRecordResolver {
         val dns = mockk<DnsRecordResolver>()
         coEvery { dns.resolve(any(), Type.SRV) } returns srv
         coEvery { dns.resolve(any(), Type.TXT) } returns emptyArray()
+        coEvery { dns.resolve(any(), Type.MX) } answers {
+            val owner = Name.fromString("${firstArg<String>()}.")
+            mxTargets.map { MXRecord(owner, DClass.IN, 3600, 10, Name.fromString(it)) }.toTypedArray()
+        }
         every { dns.bestSRVRecord(any()) } answers {
             firstArg<Array<org.xbill.DNS.Record>>().filterIsInstance<SRVRecord>().firstOrNull()
         }

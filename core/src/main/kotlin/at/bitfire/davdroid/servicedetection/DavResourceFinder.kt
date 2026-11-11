@@ -33,6 +33,7 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.Url
 import io.ktor.http.encodedPath
 import kotlinx.coroutines.CancellationException
+import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Type
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
@@ -78,6 +79,7 @@ class DavResourceFinder @AssistedInject constructor(
     private var encountered401 = false
     private var encounteredUnreachableHost = false
     private var encountered401OnTwakeDav = false
+    private val twakeMailExchangerByDomain = mutableMapOf<String, Boolean>()
 
 
     /**
@@ -365,8 +367,13 @@ class DavResourceFinder @AssistedInject constructor(
      * Try to find the principal URL by performing service discovery on a given domain name.
      * Only secure services (caldavs, carddavs) will be discovered!
      *
-     * Email-only (`mailto:`) login also tries `https://dav.<domain>` after RFC 6764 on [domain]
-     * finds no principal, unless that host was already used.
+     * Email-only (`mailto:`) login extends RFC 6764 discovery in two steps, both sending the user's
+     * credentials:
+     *
+     * 1. `https://dav.<domain>`, only when [domain] publishes no SRV record.
+     * 2. `https://dav.twake.app`, only when an MX record of [domain] points to Twake SaaS
+     *    (see [DavDiscoveryHosts.isTwakeMailExchanger]). Without that signal, the credentials of a
+     *    user hosted elsewhere never leave their own domain.
      *
      * @param domain         domain name, e.g. "icloud.com"
      * @param service        service to discover (CALDAV or CARDDAV)
@@ -407,12 +414,26 @@ class DavResourceFinder @AssistedInject constructor(
         }
 
         val emailLogin = DavDiscoveryHosts.isEmailLogin(baseURI)
-        val hosts = buildList {
+        val ownHosts = buildList {
             add(fqdn to port)
-            DavDiscoveryHosts.fallbackHost(domain, fqdn, emailLogin)?.let { add(it to 443) }
-            DavDiscoveryHosts.twakeDavHost(map { it.first }, emailLogin)?.let { add(it to 443) }
+            DavDiscoveryHosts.fallbackHost(domain, emailLogin, srvFound = srv != null)?.let { add(it to 443) }
         }
+        findPrincipalOnHosts(ownHosts, paths, service)?.let { return it }
 
+        val twakeHost = DavDiscoveryHosts.twakeDavHost(ownHosts.map { it.first }, emailLogin)
+            ?: return null
+        if (!hasTwakeMailExchanger(domain)) {
+            log.info("No MX record of $domain points to Twake, not trying $twakeHost")
+            return null
+        }
+        return findPrincipalOnHosts(listOf(twakeHost to 443), paths, service)
+    }
+
+    private suspend fun findPrincipalOnHosts(
+        hosts: List<Pair<String, Int>>,
+        paths: List<String>,
+        service: Service
+    ): Url? {
         for ((host, hostPort) in hosts)
             for (path in paths)
                 try {
@@ -438,6 +459,27 @@ class DavResourceFinder @AssistedInject constructor(
                 }
         return null
     }
+
+    /**
+     * Whether any MX record of [domain] points to Twake SaaS. Cached per domain, because CardDAV and
+     * CalDAV discovery both ask. A failed lookup counts as no match, so it never unlocks sending
+     * credentials to Twake.
+     */
+    private suspend fun hasTwakeMailExchanger(domain: String): Boolean =
+        twakeMailExchangerByDomain.getOrPut(domain.lowercase()) {
+            try {
+                val targets = dnsRecordResolver.resolve(domain, Type.MX)
+                    .filterIsInstance<MXRecord>()
+                    .map { it.target.toString(true) }
+                log.info("MX records of $domain: $targets")
+                targets.any { DavDiscoveryHosts.isTwakeMailExchanger(it) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                log.log(Level.WARNING, "MX lookup for $domain failed", e)
+                false
+            }
+        }
 
     /**
      * Queries a given URL for current-user-principal

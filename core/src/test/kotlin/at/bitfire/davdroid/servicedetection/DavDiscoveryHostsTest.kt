@@ -34,43 +34,45 @@ class DavDiscoveryHostsTest {
     fun fallbackHost_emailDomainWithoutSrv_returnsDavPrefixedHost() {
         assertEquals(
             "dav.twake.app",
-            DavDiscoveryHosts.fallbackHost("twake.app", "twake.app", emailLogin = true)
+            DavDiscoveryHosts.fallbackHost("twake.app", emailLogin = true, srvFound = false)
         )
+        assertEquals(
+            "dav.Example.COM",
+            DavDiscoveryHosts.fallbackHost("Example.COM", emailLogin = true, srvFound = false)
+        )
+    }
+
+    @Test
+    fun fallbackHost_srvFound_returnsNull() {
+        assertNull(DavDiscoveryHosts.fallbackHost("linagora.com", emailLogin = true, srvFound = true))
     }
 
     @Test
     fun fallbackHost_httpsLogin_returnsNull() {
-        assertNull(
-            DavDiscoveryHosts.fallbackHost("cloud.example.com", "cloud.example.com", emailLogin = false)
-        )
-    }
-
-    @Test
-    fun fallbackHost_srvAlreadyDavPrefixed_returnsNull() {
-        assertNull(
-            DavDiscoveryHosts.fallbackHost("linagora.com", "dav.linagora.com", emailLogin = true)
-        )
+        assertNull(DavDiscoveryHosts.fallbackHost("cloud.example.com", emailLogin = false, srvFound = false))
     }
 
     @Test
     fun fallbackHost_domainAlreadyDavPrefixed_returnsNull() {
-        assertNull(
-            DavDiscoveryHosts.fallbackHost("dav.twake.app", "dav.twake.app", emailLogin = true)
-        )
+        assertNull(DavDiscoveryHosts.fallbackHost("dav.twake.app", emailLogin = true, srvFound = false))
+        assertNull(DavDiscoveryHosts.fallbackHost("DAV.twake.app", emailLogin = true, srvFound = false))
     }
 
     @Test
-    fun fallbackHost_comparesHostsCaseInsensitively() {
-        assertNull(
-            DavDiscoveryHosts.fallbackHost("linagora.com", "DAV.LINAGORA.COM", emailLogin = true)
-        )
-        assertNull(
-            DavDiscoveryHosts.fallbackHost("DAV.twake.app", "ignored.example", emailLogin = true)
-        )
-        assertEquals(
-            "dav.Example.COM",
-            DavDiscoveryHosts.fallbackHost("Example.COM", "Example.COM", emailLogin = true)
-        )
+    fun isTwakeMailExchanger_matchesTwakeDomainAndSubdomains() {
+        assertTrue(DavDiscoveryHosts.isTwakeMailExchanger("smtp.twake.app"))
+        assertTrue(DavDiscoveryHosts.isTwakeMailExchanger("smtp.twake.app."))
+        assertTrue(DavDiscoveryHosts.isTwakeMailExchanger("SMTP.Twake.App."))
+        assertTrue(DavDiscoveryHosts.isTwakeMailExchanger("twake.app"))
+    }
+
+    @Test
+    fun isTwakeMailExchanger_rejectsLookAlikes() {
+        assertFalse(DavDiscoveryHosts.isTwakeMailExchanger("smtp.twake.app.example.com"))
+        assertFalse(DavDiscoveryHosts.isTwakeMailExchanger("eviltwake.app"))
+        assertFalse(DavDiscoveryHosts.isTwakeMailExchanger("twake.apps"))
+        assertFalse(DavDiscoveryHosts.isTwakeMailExchanger("mx0.mail.ovh.net"))
+        assertFalse(DavDiscoveryHosts.isTwakeMailExchanger(""))
     }
 
     @Test
