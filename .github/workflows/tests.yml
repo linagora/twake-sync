@@ -10,6 +10,11 @@ concurrency:
   group: ${{github.workflow_ref}}-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege: the jobs only check out code, list changed files and use the Actions cache.
+permissions:
+  contents: read        # actions/checkout
+  pull-requests: read   # dorny/paths-filter lists PR files through the API
+
 # We provide a remote Gradle build cache. Take the settings from the secrets and enable
 # configuration and build cache for all gradle jobs.
 #
@@ -103,7 +108,7 @@ jobs:
       # Gradle and Android SDK often take more space than what is available on the default runner.
       # We try to free a few GB here to make gradle-managed devices more reliable.
       - name: Free some disk space
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6   # v2.0.0
         with:
           android: false          # we need the Android SDK
           large-packages: false   # apt takes too long
@@ -241,6 +246,7 @@ jobs:
 
   tests:
     name: Tests
+    permissions: {}   # only evaluates needs.*.result
     needs: [ core_unit_tests, core_instrumented_tests, synctools_unit_tests, synctools_instrumented_tests ]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
