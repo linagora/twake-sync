@@ -23,6 +23,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.xbill.DNS.DClass
+import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Name
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.Type
@@ -507,10 +508,17 @@ class EmailLoginFallbackAppAccountsE2ETest {
         }
     }
 
-    private fun dnsResolver(srv: Array<org.xbill.DNS.Record> = emptyArray()): DnsRecordResolver {
+    private fun dnsResolver(
+        srv: Array<org.xbill.DNS.Record> = emptyArray(),
+        mxTargets: List<String> = listOf("smtp.twake.app.")
+    ): DnsRecordResolver {
         val dns = mockk<DnsRecordResolver>()
         coEvery { dns.resolve(any(), Type.SRV) } returns srv
         coEvery { dns.resolve(any(), Type.TXT) } returns emptyArray()
+        coEvery { dns.resolve(any(), Type.MX) } answers {
+            val owner = Name.fromString("${firstArg<String>()}.")
+            mxTargets.map { MXRecord(owner, DClass.IN, 3600, 10, Name.fromString(it)) }.toTypedArray()
+        }
         every { dns.bestSRVRecord(any()) } answers {
             firstArg<Array<org.xbill.DNS.Record>>().filterIsInstance<SRVRecord>().firstOrNull()
         }

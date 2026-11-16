@@ -25,6 +25,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.ConscryptMode
 import org.xbill.DNS.DClass
+import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Name
 import org.xbill.DNS.SRVRecord
 import org.xbill.DNS.TXTRecord
@@ -158,7 +159,7 @@ class DavResourceFinderDiscoverTest {
     }
 
     @Test
-    fun discoverPrincipalUrl_triesDavPrefixedHostAfterNonDavSrvTarget() = runTest {
+    fun discoverPrincipalUrl_srvFound_doesNotGuessDavPrefixedHost() = runTest {
         val requestedHosts = mutableListOf<String>()
         val srv = SRVRecord(
             Name.fromString("_caldavs._tcp.example.com."),
@@ -166,22 +167,7 @@ class DavResourceFinderDiscoverTest {
         )
         val engine = MockEngine { request ->
             requestedHosts += request.url.host
-            when {
-                request.method == HttpMethod.Options && request.url.host == "dav.example.com" ->
-                    respond("", HttpStatusCode.OK, headersOf("DAV", "calendar-access"))
-                request.method.value == "PROPFIND" &&
-                    request.url.host == "dav.example.com" &&
-                    request.url.encodedPath == "/.well-known/caldav" ->
-                    respond(
-                        multistatus(
-                            "/.well-known/caldav",
-                            "<current-user-principal><href>/principals/alice</href></current-user-principal>"
-                        ),
-                        HttpStatusCode.MultiStatus,
-                        xmlHeaders
-                    )
-                else -> respond("", HttpStatusCode.NotFound)
-            }
+            respond("", HttpStatusCode.NotFound)
         }
 
         HttpClient(engine).use { client ->
@@ -192,13 +178,10 @@ class DavResourceFinderDiscoverTest {
                 Logger.getLogger("test"),
                 dnsResolver(srv = arrayOf(srv), txt = emptyArray())
             )
-            assertEquals(
-                Url("https://dav.example.com/principals/alice"),
-                finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV)
-            )
+            assertNull(finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV))
         }
 
-        assertEquals(listOf("caldav.example.com", "dav.example.com"), requestedHosts.distinct())
+        assertEquals(listOf("caldav.example.com"), requestedHosts.distinct())
     }
 
     @Test
@@ -268,12 +251,12 @@ class DavResourceFinderDiscoverTest {
             assertNull(finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV))
         }
 
-        assertEquals(listOf("dav.example.com", "dav.twake.app"), requestedHosts.distinct())
+        assertEquals(listOf("dav.example.com"), requestedHosts.distinct())
         assertTrue(requestedHosts.none { it == "dav.dav.example.com" })
     }
 
     @Test
-    fun discoverPrincipalUrl_emailLogin_triesDavTwakeAppAfterCustomDavHost() = runTest {
+    fun discoverPrincipalUrl_emailLoginWithTwakeMx_triesDavTwakeAppAfterCustomDavHost() = runTest {
         val requestedHosts = mutableListOf<String>()
         val engine = MockEngine { request ->
             requestedHosts += request.url.host
@@ -301,7 +284,11 @@ class DavResourceFinderDiscoverTest {
                 null,
                 client,
                 Logger.getLogger("test"),
-                dnsResolver(srv = emptyArray(), txt = emptyArray())
+                dnsResolver(
+                    srv = emptyArray(),
+                    txt = emptyArray(),
+                    mxTargets = listOf("mx0.mail.ovh.net.", "smtp.twake.app.")
+                )
             )
             assertEquals(
                 Url("https://dav.twake.app/principals/alice"),
@@ -351,14 +338,91 @@ class DavResourceFinderDiscoverTest {
         )
     }
 
+    @Test
+    fun discoverPrincipalUrl_emailLoginWithoutTwakeMx_neverContactsDavTwakeApp() = runTest {
+        val requestedHosts = mutableListOf<String>()
+        val engine = MockEngine { request ->
+            requestedHosts += request.url.host
+            respond("", HttpStatusCode.Unauthorized, headersOf(HttpHeaders.WWWAuthenticate, "Basic realm=\"dav\""))
+        }
+
+        HttpClient(engine).use { client ->
+            val finder = DavResourceFinder(
+                URI("mailto:alice@example.com"),
+                null,
+                client,
+                Logger.getLogger("test"),
+                dnsResolver(srv = emptyArray(), txt = emptyArray(), mxTargets = listOf("mx.example.com."))
+            )
+            assertNull(finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV))
+        }
+
+        assertEquals(listOf("example.com", "dav.example.com"), requestedHosts.distinct())
+    }
+
+    @Test
+    fun discoverPrincipalUrl_lookAlikeMx_neverContactsDavTwakeApp() = runTest {
+        val requestedHosts = mutableListOf<String>()
+        val engine = MockEngine { request ->
+            requestedHosts += request.url.host
+            respond("", HttpStatusCode.NotFound)
+        }
+
+        HttpClient(engine).use { client ->
+            val finder = DavResourceFinder(
+                URI("mailto:alice@example.com"),
+                null,
+                client,
+                Logger.getLogger("test"),
+                dnsResolver(
+                    srv = emptyArray(),
+                    txt = emptyArray(),
+                    mxTargets = listOf("smtp.twake.app.example.com.", "eviltwake.app.")
+                )
+            )
+            assertNull(finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV))
+        }
+
+        assertTrue(requestedHosts.none { it == "dav.twake.app" })
+    }
+
+    @Test
+    fun discoverPrincipalUrl_mxLookupFails_neverContactsDavTwakeApp() = runTest {
+        val requestedHosts = mutableListOf<String>()
+        val engine = MockEngine { request ->
+            requestedHosts += request.url.host
+            respond("", HttpStatusCode.NotFound)
+        }
+        val dns = dnsResolver(srv = emptyArray(), txt = emptyArray())
+        coEvery { dns.resolve(any(), Type.MX) } throws java.io.IOException("DNS timeout")
+
+        HttpClient(engine).use { client ->
+            val finder = DavResourceFinder(
+                URI("mailto:alice@example.com"),
+                null,
+                client,
+                Logger.getLogger("test"),
+                dns
+            )
+            assertNull(finder.discoverPrincipalUrl("example.com", DavResourceFinder.Service.CALDAV))
+        }
+
+        assertTrue(requestedHosts.none { it == "dav.twake.app" })
+    }
+
     private fun dnsResolver(
         srv: Array<org.xbill.DNS.Record>,
         txt: Array<org.xbill.DNS.Record>,
-        txtPaths: List<String> = emptyList()
+        txtPaths: List<String> = emptyList(),
+        mxTargets: List<String> = emptyList()
     ): DnsRecordResolver {
         val dns = mockk<DnsRecordResolver>()
         coEvery { dns.resolve(any(), Type.SRV) } returns srv
         coEvery { dns.resolve(any(), Type.TXT) } returns txt
+        coEvery { dns.resolve(any(), Type.MX) } answers {
+            val owner = Name.fromString("${firstArg<String>()}.")
+            mxTargets.map { MXRecord(owner, DClass.IN, 3600, 10, Name.fromString(it)) }.toTypedArray()
+        }
         every { dns.bestSRVRecord(any()) } answers {
             val records = firstArg<Array<org.xbill.DNS.Record>>()
             records.filterIsInstance<SRVRecord>().firstOrNull()
