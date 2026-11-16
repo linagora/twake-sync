@@ -36,9 +36,9 @@ jobs:
     needs: authorize
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive   # translations live in the l10n submodule
 
@@ -50,11 +50,11 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: ${{ env.java-version }}
-      - uses: gradle/actions/setup-gradle@v6.3.0
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
       - name: Prepare keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d >"$RUNNER_TEMP/keystore.jks"
@@ -85,25 +85,68 @@ jobs:
           mkdir -p "$RUNNER_TEMP/whatsnew"
           grep '^- ' "$RUNNER_TEMP/release-notes.md" | sed 's/`//g' | head -c 500 >"$RUNNER_TEMP/whatsnew/whatsnew-en-US"
 
-      - name: Upload to Google Play (internal track)
-        uses: r0adkll/upload-google-play@v1.1.5
+      - name: Collect release files
+        run: |
+          dist="$RUNNER_TEMP/dist"
+          mkdir -p "$dist/aab" "$dist/apk" "$dist/whatsnew"
+          cp app-ose/build/outputs/bundle/oseRelease/*.aab "$dist/aab/"
+          cp app-ose/build/outputs/apk/ose/release/*.apk "$dist/apk/"
+          cp app-ose/build/outputs/mapping/oseRelease/mapping.txt "$dist/"
+          cp "$RUNNER_TEMP/release-notes.md" "$dist/"
+          cp "$RUNNER_TEMP/whatsnew/whatsnew-en-US" "$dist/whatsnew/"
+
+      # The publish jobs get only these files, never the keystore or its passwords
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-files
+          path: ${{ runner.temp }}/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-play:
+    name: Upload to Google Play (internal track)
+    needs: build
+    runs-on: ubuntu-latest
+    # holds the Play service account key; kept apart from the signing keystore
+    environment: play-release
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-files
+          path: dist
+
+      - uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: com.twake.android.sync
-          releaseFiles: app-ose/build/outputs/bundle/oseRelease/*.aab
+          releaseFiles: dist/aab/*.aab
           releaseName: ${{ github.ref_name }}
           track: internal
           status: completed
-          mappingFile: app-ose/build/outputs/mapping/oseRelease/mapping.txt
-          whatsNewDirectory: ${{ runner.temp }}/whatsnew
+          mappingFile: dist/mapping.txt
+          whatsNewDirectory: dist/whatsnew
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v3
+  publish-github:
+    name: Create GitHub release
+    # only after the Play upload succeeded, as before
+    needs: publish-play
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-files
+          path: dist
+
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           name: Twake Sync ${{ github.ref_name }}
-          body_path: ${{ runner.temp }}/release-notes.md
+          body_path: dist/release-notes.md
           files: |
-            app-ose/build/outputs/bundle/oseRelease/*.aab
-            app-ose/build/outputs/apk/ose/release/*.apk
-            app-ose/build/outputs/mapping/oseRelease/mapping.txt
+            dist/aab/*.aab
+            dist/apk/*.apk
+            dist/mapping.txt
           fail_on_unmatched_files: true
