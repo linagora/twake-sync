@@ -3,6 +3,12 @@
 Twake Sync is based on [DAVx⁵ OSE](https://github.com/bitfireAT/davx5-ose). This file lists only
 Twake Sync specific changes; see the upstream project for DAVx⁵ changes.
 
+## 2026.11.17.01
+
+### Changed
+- Login: `dav.twake.app` is tried only when an MX record of the email domain points to `twake.app`, so the credentials of users hosted elsewhere stay on their own domain
+- Login: `dav.<email domain>` is only guessed when the domain publishes no SRV record
+
 ## 2026.10.26.01
 
 ### Changed

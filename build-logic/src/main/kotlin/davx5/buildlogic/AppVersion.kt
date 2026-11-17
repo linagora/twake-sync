@@ -30,7 +30,7 @@ import davx5.buildlogic.AppVersion.NAME
  */
 object AppVersion {
 
-    const val CODE: Int = 405200006
+    const val CODE: Int = 405200007
     const val NAME: String = "4.5.20"
 
 }
