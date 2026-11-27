@@ -35,6 +35,9 @@ jobs:
     name: Build signed release
     needs: authorize
     runs-on: ubuntu-latest
+    # holds the ANDROID_KEYSTORE_*/ANDROID_KEY_* signing secrets; it deploys only date tags,
+    # which only admins may create (tag ruleset), so no other workflow or ref gets the key
+    environment: signing
     permissions:
       contents: read
     steps:
