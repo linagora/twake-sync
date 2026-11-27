@@ -42,6 +42,13 @@ jobs:
               - 'synctools/**'
               - 'gradle/libs.versions.toml'
 
+  workflow_lint:
+    name: Check workflow secrets and pins
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: .github/scripts/check-workflow-secrets.sh
+
   compile_core:
     name: Compile
     runs-on: ubuntu-latest
